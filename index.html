@@ -11,61 +11,23 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Noto+Sans:wght@100;300;400&family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Noto+Serif:wght@700&display=swap');
 
         /* --- 0. Global Settings --- */
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #020202; font-family: 'Noto Sans', sans-serif; color: #fff; overflow-x: hidden; cursor: none; /* Hide default cursor for immersion */ }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #020202; font-family: 'Noto Sans', sans-serif; color: #fff; overflow-x: hidden; cursor: none; }
         ::-webkit-scrollbar { width: 0; }
 
-        /* --- 1. Film Grain Overlay (Texture Layer) --- */
+        /* --- 1. Film Grain Overlay --- */
         .film-grain {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9998; /* Top layer, below flash */
-            opacity: 0.08; /* Subtle noise */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998; opacity: 0.08;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
             animation: grain-move 8s steps(10) infinite;
         }
-        @keyframes grain-move {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-5%, -5%); }
-            20% { transform: translate(-10%, 5%); }
-            30% { transform: translate(5%, -10%); }
-            40% { transform: translate(-5%, 15%); }
-            50% { transform: translate(-10%, 5%); }
-            60% { transform: translate(15%, 0); }
-            70% { transform: translate(0, 10%); }
-            80% { transform: translate(-15%, 0); }
-            90% { transform: translate(10%, 5%); }
-        }
+        @keyframes grain-move { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-5%, -5%); } 20% { transform: translate(-10%, 5%); } 30% { transform: translate(5%, -10%); } 40% { transform: translate(-5%, 15%); } 50% { transform: translate(-10%, 5%); } 60% { transform: translate(15%, 0); } 70% { transform: translate(0, 10%); } 80% { transform: translate(-15%, 0); } 90% { transform: translate(10%, 5%); } }
 
-        /* --- 2. Digital Wisp (Mouse Follower Canvas) --- */
-        #wisp-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9990; /* High z-index */
-            mix-blend-mode: screen; /* Glowing effect */
-        }
+        /* --- 2. Digital Wisp --- */
+        #wisp-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9990; mix-blend-mode: screen; }
 
         /* --- 3. Audio Toggle UI --- */
         #audio-toggle {
-            position: fixed;
-            bottom: 30px;
-            left: 40px;
-            z-index: 100;
-            font-family: 'Syncopate';
-            font-size: 10px;
-            color: rgba(255,255,255,0.5);
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 12px;
-            transition: 0.3s;
-            mix-blend-mode: difference;
+            position: fixed; bottom: 30px; left: 40px; z-index: 100; font-family: 'Syncopate'; font-size: 10px; color: rgba(255,255,255,0.5); cursor: pointer; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; transition: 0.3s; mix-blend-mode: difference;
         }
         #audio-toggle:hover { color: #ffae00; border-color: #ffae00; }
         .eq-bar { display: inline-block; width: 2px; height: 8px; background: currentColor; margin-right: 2px; animation: eq-bounce 0.5s infinite ease-in-out alternate; }
@@ -74,21 +36,8 @@
         #audio-toggle.muted .eq-bar { animation: none; height: 2px; }
         @keyframes eq-bounce { 0% { transform: scaleY(0.5); } 100% { transform: scaleY(1.5); } }
 
-        /* --- 4. CREDITS FOOTER (ENGLISH) --- */
-        .credits-fixed {
-            position: fixed;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            font-family: 'Noto Sans', sans-serif;
-            font-size: 10px;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.6);
-            z-index: 200;
-            pointer-events: none;
-            mix-blend-mode: difference; /* Visible on white and black */
-            text-transform: uppercase;
-        }
+        /* --- 4. Credits --- */
+        .credits-fixed { position: fixed; bottom: 10px; width: 100%; text-align: center; font-family: 'Noto Sans', sans-serif; font-size: 10px; letter-spacing: 1px; color: rgba(255, 255, 255, 0.6); z-index: 200; pointer-events: none; mix-blend-mode: difference; text-transform: uppercase; }
 
         /* --- Existing Styles --- */
         #soul-tree-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity 0.5s; }
@@ -533,6 +482,9 @@
             
             // Try to play BGM on start
             const bgm = document.getElementById('bgm');
+            // --- VOLUME ADJUSTMENT: LOWERED BGM ---
+            bgm.volume = 0.2; 
+            
             bgm.play().then(() => {
                 bgmPlaying = true;
             }).catch(e => {
@@ -759,7 +711,22 @@
         function startZenAudio() {
             const createDrone = (freq) => { const osc = audioCtx.createOscillator(); osc.frequency.value = freq; const gain = audioCtx.createGain(); gain.gain.value = 0.05; osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); return {o:osc, g:gain}; };
             zenNodes.push(createDrone(110)); zenNodes.push(createDrone(112));
-            const bowlLoop = setInterval(() => { const t = audioCtx.currentTime; [220, 540, 800].forEach(f => { const o = audioCtx.createOscillator(); o.frequency.value = f; const g = audioCtx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.1, t + 0.1); g.gain.exponentialRampToValueAtTime(0.001, t + 6); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(t + 6); }); }, 8000);
+            
+            const playBowl = () => {
+                 const t = audioCtx.currentTime;
+                 [220, 540, 800].forEach(f => {
+                     const o = audioCtx.createOscillator();
+                     o.frequency.value = f;
+                     const g = audioCtx.createGain();
+                     g.gain.setValueAtTime(0, t);
+                     g.gain.linearRampToValueAtTime(0.3, t + 0.02);
+                     g.gain.exponentialRampToValueAtTime(0.001, t + 4);
+                     o.connect(g); g.connect(audioCtx.destination);
+                     o.start(); o.stop(t + 4);
+                 });
+            };
+            playBowl(); 
+            const bowlLoop = setInterval(playBowl, 3000);
             zenNodes.push({interval: bowlLoop});
         }
         function stopZenAudio() { zenNodes.forEach(n => { if(n.o) { n.g.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5); setTimeout(()=>n.o.stop(), 500); } if(n.interval) clearInterval(n.interval); }); zenNodes = []; }
@@ -768,7 +735,7 @@
         function playHat(t) { const bufferSize = audioCtx.sampleRate * 0.05; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i=0; i<bufferSize; i++) data[i]=(Math.random()*2-1); const noise = audioCtx.createBufferSource(); noise.buffer = buffer; const filter = audioCtx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 5000; const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.3, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05); noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start(t); }
         function startHipHopAudio() { let beat = 0; const stepTime = 60/90/2; hiphopTimer = setInterval(() => { const t = audioCtx.currentTime; if(beat%8 === 0) playKick(t); if(beat%8 === 2) playHat(t); if(beat%8 === 4) { playSnare(t); playKick(t+0.1); } if(beat%8 === 6) playHat(t); beat++; }, stepTime * 1000); }
         function stopHipHopAudio() { clearInterval(hiphopTimer); }
-        function startTripHopAudio() { const freqs = [174.61, 207.65, 261.63, 311.13]; const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400; const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.2; const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 200; lfo.connect(lfoGain); lfoGain.connect(filter.frequency); const masterG = audioCtx.createGain(); masterG.gain.value = 0; filter.connect(masterG); masterG.connect(audioCtx.destination); freqs.forEach(f => { const osc = audioCtx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = f + (Math.random()-0.5)*2; osc.connect(filter); osc.start(); triphopNodes.push(osc); }); lfo.start(); triphopNodes.push(lfo); triphopNodes.push(masterG); masterG.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 2); }
+        function startTripHopAudio() { const freqs = [174.61, 207.65, 261.63, 311.13]; const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400; const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.2; const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 200; lfo.connect(lfoGain); lfoGain.connect(filter.frequency); const masterG = audioCtx.createGain(); masterG.gain.value = 0; filter.connect(masterG); masterG.connect(audioCtx.destination); freqs.forEach(f => { const osc = audioCtx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = f + (Math.random()-0.5)*2; osc.connect(filter); osc.start(); triphopNodes.push(osc); }); lfo.start(); triphopNodes.push(lfo); triphopNodes.push(masterG); masterG.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 2); }
         function stopTripHopAudio() { if(triphopNodes.length>0) { const g = triphopNodes[triphopNodes.length-1]; if(g && g.gain) g.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5); setTimeout(() => { triphopNodes.forEach(n => { try{n.stop()}catch(e){} }); triphopNodes=[]; }, 1000); } }
         function startWorldAudio(idx) { stopZenAudio(); stopHipHopAudio(); stopTripHopAudio(); if(idx === 0) startZenAudio(); if(idx === 1) startHipHopAudio(); if(idx === 2) startTripHopAudio(); }
 
