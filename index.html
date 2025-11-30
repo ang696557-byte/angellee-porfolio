@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIND & VOID | 封神·灵体叙事终章</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Noto+Sans+SC:wght@100;300;400&family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Noto+Serif+SC:wght@700&display=swap');
+
+        /* --- 0. 全局设置 --- */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #020202; font-family: 'Noto Sans SC', sans-serif; color: #fff; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 0; }
+
+        /* --- 1. 背景层 --- */
+        #soul-tree-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity 0.5s; }
+        body.active #soul-tree-canvas { opacity: 0.6; }
+        .ambient-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 100%, #2a1500 0%, #000 75%); z-index: -1; }
+        #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        body.flashing #flash-overlay { opacity: 1; transition: none; }
+
+        /* --- 2. 开场 --- */
+        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #020202; z-index: 5000; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s; }
+        #start-screen.hidden { display: none; }
+        #box-container { position: relative; width: 260px; height: 180px; background: linear-gradient(135deg, #1a0d00, #000); border: 1px solid rgba(255, 174, 0, 0.3); box-shadow: 0 0 30px rgba(255, 69, 0, 0.15); display: flex; justify-content: center; align-items: center; color: rgba(255,255,255,0.9); font-size: 16px; letter-spacing: 4px; font-family: 'Syncopate'; cursor: pointer; transition: all 0.5s; z-index: 5001; }
+        #box-container:hover { border-color: #ffae00; box-shadow: 0 0 60px rgba(255, 174, 0, 0.4); transform: scale(1.02); }
+
+        /* --- 3. 主界面 --- */
+        #main-interface { position: fixed; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; transition: opacity 1s ease; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; z-index: 10; }
+        body.active #main-interface { opacity: 1; pointer-events: auto; }
+        
+        .tree-header { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; z-index: 10; }
+        .neon-title { font-family: 'Orbitron'; font-weight: 900; font-size: 10vw; line-height: 0.9; color: transparent; -webkit-text-stroke: 2px #ffae00; text-align: center; margin-bottom: 30px; text-shadow: 0 0 20px #ffae00; animation: jellyfish 6s ease-in-out infinite; }
+        @keyframes jellyfish { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .neon-sub { font-size: 1.4rem; letter-spacing: 12px; color: rgba(255,255,255,0.9); }
+
+        .content-stream { position: relative; max-width: 1000px; margin: 0 auto; padding-bottom: 100px; }
+        .vine-section { position: relative; padding-top: 20vh; padding-bottom: 15vh; max-width: 1600px; margin: 0 auto; z-index: 1; }
+        #global-vine-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
+        .vine-path-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 12px; stroke-linecap: round; }
+        .vine-path-main { fill: none; stroke: url(#vineGradient); stroke-width: 8px; stroke-linecap: round; filter: drop-shadow(0 0 10px #ff4500); stroke-dasharray: 3000; stroke-dashoffset: 3000; transition: stroke-dashoffset 0.1s linear; }
+
+        .intro-wide-block { width: 90%; max-width: 1200px; height: 350px; margin: 0 auto 80px auto; position: relative; z-index: 5; }
+        .intro-img-box { width: 100%; height: 100%; overflow: hidden; border: 1px solid rgba(255, 174, 0, 0.5); border-radius: 4px; background: #000; }
+        .intro-img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .node-block { display: flex; justify-content: center; align-items: center; margin-bottom: 60px; position: relative; z-index: 2; gap: 80px; opacity: 0; transform: translateY(50px); transition: all 1s; }
+        .node-block.is-visible { opacity: 1; transform: translateY(0); }
+        .node-block:nth-child(odd) { flex-direction: row; } .node-block:nth-child(even) { flex-direction: row-reverse; }
+        .node-meta { width: 30%; min-width: 250px; }
+        .meta-id { font-family: 'Cinzel'; font-size: 60px; color: #ffae00; display: block; margin-bottom: 10px; }
+        .meta-title { font-family: 'Noto Sans SC'; font-size: 20px; font-weight: 300; letter-spacing: 5px; color: #fff; margin: 0 0 5px 0; }
+        .meta-sub { font-family: 'Syncopate'; font-size: 10px; color: #ff4500; letter-spacing: 2px; display: block; margin-bottom: 10px; }
+        .meta-desc { color: #aaa; font-size: 12px; line-height: 1.6; font-weight: 300; }
+        .node-visual { width: 350px; perspective: 800px; }
+        .img-container { width: 100%; aspect-ratio: 4/3; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transform: rotateY(10deg); transition: 0.5s; filter: grayscale(100%); }
+        .node-block:nth-child(even) .img-container { transform: rotateY(-10deg); }
+        .node-visual:hover .img-container { transform: rotateY(0deg) scale(1.02); border-color: #ffae00; filter: grayscale(0%); }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; }
+
+        .transition-title-block { text-align: center; margin: 150px 0 50px 0; opacity: 0; transform: translateY(30px); transition: 1s; }
+        .transition-title-block.is-visible { opacity: 1; transform: translateY(0); }
+        .trans-title { font-family: 'Orbitron'; font-size: 60px; color: #fff; letter-spacing: 10px; text-shadow: 0 0 30px rgba(255, 174, 0, 0.6); }
+
+        /* --- PART 2: 全息数据舞台 --- */
+        #hologram-stage { position: relative; width: 100vw; height: 100vh; margin: 80px 0; background: radial-gradient(circle at center, rgba(255, 69, 0, 0.05) 0%, transparent 60%); overflow: hidden; border-top: 1px solid rgba(255, 69, 0, 0.4); border-bottom: 1px solid rgba(255, 69, 0, 0.4); }
+        #three-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+        .holo-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #ffae00; box-shadow: 0 0 10px #ffae00; animation: scan-move 4s linear infinite; opacity: 0.5; }
+        @keyframes scan-move { 0% { top: 0%; opacity: 0; } 100% { top: 100%; opacity: 0; } }
+
+        /* --- LAB: VISUAL SYNTHESIS --- */
+        #synthesis-lab { position: relative; width: 100%; padding: 120px 0; background: #050505; border-top: 1px solid #222; border-bottom: 1px solid #222; z-index: 15; display: flex; flex-direction: column; align-items: center; }
+        .lab-connector { position: absolute; top: -50px; left: 50%; width: 2px; height: 100px; background: linear-gradient(to bottom, #ff4500, #ffae00); box-shadow: 0 0 10px #ffae00; z-index: 5; }
+        .lab-title-box { text-align: center; margin-bottom: 60px; position: relative; z-index: 2; }
+        .lab-sub { font-family: 'Share Tech Mono'; color: #ff4500; letter-spacing: 3px; font-size: 12px; }
+        .lab-main-title { font-family: 'Orbitron'; color: #fff; font-size: 32px; letter-spacing: 6px; margin: 10px 0; text-shadow: 0 0 15px rgba(255, 174, 0, 0.3); }
+
+        .lab-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; width: 95%; max-width: 1400px; }
+        .lab-card { width: 350px; height: 500px; border: 1px solid #333; background: #0a0a0a; position: relative; overflow: hidden; transition: 0.3s; }
+        .lab-card:hover { border-color: #ffae00; box-shadow: 0 0 40px rgba(255, 69, 0, 0.2); }
+        .card-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; z-index: 10; pointer-events: none; }
+        .card-head { font-family: 'Syncopate'; font-weight: 700; color: #888; border-bottom: 1px solid #333; padding-bottom: 15px; display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .card-icon { color: #ff4500; }
+        .card-options { pointer-events: auto; display: flex; flex-direction: column; gap: 15px; margin-top: auto; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 4px; border: 1px solid #333; transform: translateY(0); transition: 0.3s; }
+        .lab-card:hover .card-options { border-color: #555; }
+        .opt-item { font-family: 'Orbitron'; font-size: 14px; color: #888; letter-spacing: 2px; cursor: pointer; padding: 10px; border-left: 2px solid transparent; transition: 0.2s; background: rgba(255,255,255,0.02); }
+        .opt-item:hover, .opt-item.active { color: #ffae00; border-left: 2px solid #ffae00; background: rgba(255, 174, 0, 0.1); padding-left: 15px; }
+        .opt-item span { display: block; font-family: 'Noto Sans SC'; font-size: 10px; color: #555; letter-spacing: 0; margin-top: 2px; }
+        .visual-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.4; transition: opacity 0.3s; }
+        .lab-card:hover .visual-layer { opacity: 1; }
+        .viz-canvas { width: 100%; height: 100%; display: block; }
+        #avatar-3d-container { width: 100%; height: 100%; }
+
+        /* --- PART 3: 任意门 (Chronos Gate) --- */
+        .chronos-section { 
+            position: relative; width: 100%; height: 100vh; 
+            background: #000; border-top: 1px solid #333; 
+            z-index: 20; 
+            display: flex; flex-direction: column; 
+            transition: background-color 1s ease; 
+            overflow: visible !important;
+        }
+        .chronos-connector { position: absolute; top: 0; left: 50%; width: 2px; height: 50px; background: linear-gradient(to bottom, #ffae00, transparent); z-index: 25; }
+        #chronos-container { width: 100%; flex-grow: 1; position: relative; }
+        
+        .gate-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 30px; box-sizing: border-box; }
+        .gate-header { text-align: center; margin-top: 20px; }
+        .gate-title { font-family: 'Orbitron'; font-size: 30px; letter-spacing: 8px; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+        .gate-sub { font-family: 'Noto Serif SC'; font-size: 14px; color: #aaa; margin-top: 5px; }
+        
+        .gate-hud { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 1px dashed rgba(255,255,255,0.3); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.5s; opacity: 0; z-index: 30; }
+        .gate-hud.active { opacity: 1; border: 4px solid #fff; width: 280px; height: 280px; background: rgba(255,255,255,0.05); box-shadow: 0 0 50px rgba(255,255,255,0.1); }
+        .gate-icon { font-size: 40px; margin-bottom: 10px; }
+        .gate-status { font-family: 'Syncopate'; font-size: 10px; letter-spacing: 2px; color: #fff; }
+
+        /* (已删除) 滴落效果 Canvas 样式 */
+
+        .gate-controls { display: flex; justify-content: space-between; align-items: flex-end; opacity: 0; transition: 1s; }
+        .gate-controls.visible { opacity: 1; }
+        .gate-guide { font-family: 'Syncopate'; font-size: 10px; color: #888; line-height: 1.6; text-align: left; }
+        .gate-monitor { display: flex; gap: 10px; pointer-events: auto; background: rgba(0,0,0,0.5); padding: 5px; border: 1px solid #333; }
+        .monitor-screen { width: 80px; height: 60px; background: #111; border: 1px solid #555; transform: scaleX(-1); }
+        .monitor-screen video, .monitor-screen canvas { width: 100%; height: 100%; object-fit: cover; }
+
+        .gate-start-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); z-index: 50; transition: opacity 0.5s; }
+        .gate-start-layer.hidden { opacity: 0; pointer-events: none; }
+        .btn-activate { padding: 20px 50px; border: 2px solid #ffae00; color: #fff; font-family: 'Orbitron'; font-size: 18px; letter-spacing: 4px; background: rgba(0,0,0,0.6); cursor: pointer; transition: 0.3s; box-shadow: 0 0 30px rgba(255, 174, 0, 0.2); pointer-events: auto; }
+        .btn-activate:hover { background: #ffae00; color: #000; box-shadow: 0 0 60px #ffae00; }
+
+        /* --- 结尾: 纯白灵体 --- */
+        #outro-summary { position: relative; width: 100%; height: 100vh; background-color: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 20; overflow: hidden; }
+        #outro-canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .outro-content { display: none; }
+
+        .nav-fixed { position: fixed; bottom: 30px; right: 40px; z-index: 100; mix-blend-mode: difference; }
+        .nav-link { font-family: 'Syncopate'; font-size: 10px; color: #fff; cursor: pointer; }
+        #process-canvas { display: none; }
+    </style>
+</head>
+<body>
+    <div id="flash-overlay"></div>
+    <div class="ambient-glow"></div>
+    <canvas id="soul-tree-canvas"></canvas>
+
+    <div id="start-screen">
+        <div id="box-container" onclick="initializeSystem()"><span>INITIALIZE</span></div>
+    </div>
+
+    <div id="main-interface">
+        <div class="tree-header">
+            <h1 class="neon-title">BREAK<br>THE BOX</h1>
+            <div class="neon-sub">从在地 到悬空</div>
+        </div>
+
+        <div class="content-stream">
+            <div class="intro-wide-block" id="intro-anchor">
+                <div class="intro-img-box"><img src="images/image_e25b31.jpg" alt="Intro"></div>
+            </div>
+
+            <section class="vine-section">
+                <svg id="global-vine-svg">
+                    <defs><linearGradient id="vineGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ffae00" /><stop offset="100%" stop-color="#ff4500" /></linearGradient></defs>
+                    <path id="vine-bg" class="vine-path-bg" /><path id="vine-main" class="vine-path-main" />
+                </svg>
+                <div class="node-block" id="node-1">
+                    <div class="node-meta"><span class="meta-id">01</span><span class="meta-sub">Wing Chun</span><h2 class="meta-title">方寸之间</h2><div class="meta-desc"><p>身体是第一个容器。在木人桩的敲击与老旧街区的光影中，我建立了自己的坐标系。</p></div></div>
+                    <div class="node-visual"><div class="img-container"><img src="images/c1.jpg" alt="Roots"></div></div>
+                </div>
+                <div class="node-block" id="node-2">
+                    <div class="node-visual"><div class="img-container"><img src="images/c2.jpg" alt="Flow"></div></div>
+                    <div class="node-meta"><span class="meta-id">02</span><span class="meta-sub">Flow</span><h2 class="meta-title">西岸律动</h2><div class="meta-desc"><p>打破规矩的瞬间。加州的阳光穿透了黑白电视的雪花，节奏成为新的语言。</p></div></div>
+                </div>
+                <div class="node-block" id="node-3">
+                    <div class="node-meta"><span class="meta-id">03</span><span class="meta-sub">Void</span><h2 class="meta-title">神游太虚</h2><div class="meta-desc"><p>重力的消亡。在 Trip-hop 的低频与迷幻霓虹中，我构建了悬浮的内在舞台。</p></div></div>
+                    <div class="node-visual"><div class="img-container"><img src="images/c3.jpg" alt="Void"></div></div>
+                </div>
+            </section>
+
+            <div class="transition-title-block">
+                <div style="width:2px; height:100px; background:#ffae00; margin:0 auto 20px auto;"></div>
+                <h2 class="trans-title">INFINITE STAGE</h2>
+            </div>
+        </div>
+
+        <section id="hologram-stage">
+            <div class="scan-line"></div>
+            <div id="three-container"></div>
+            <div class="holo-ui">
+                <div style="position:absolute; top:40px; left:50%; transform:translateX(-50%); text-align:center; color:#fff;">
+                    <h3 style="font-family:'Orbitron'; letter-spacing:5px; margin:0;">WING CHUN DATA</h3>
+                    <span style="font-family:'Syncopate'; font-size:10px; color:#ff4500;">MOTION CAPTURE</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="synthesis-lab">
+            <div class="lab-connector"></div>
+            <div class="lab-title-box">
+                <span class="lab-sub">DECONSTRUCTING MOVEMENT</span>
+                <h2 class="lab-main-title">ELEMENT SYNTHESIS</h2>
+                <span class="lab-sub">SELECT PARAMETERS TO RECONSTRUCT</span>
+            </div>
+
+            <div class="lab-grid">
+                <div class="lab-card" onmouseenter="startAudioPreview()" onmouseleave="stopAudioPreview()">
+                    <div class="visual-layer"><canvas id="viz-audio" class="viz-canvas"></canvas></div>
+                    <div class="card-content">
+                        <div class="card-head"><span>SEQUENCER</span><span class="card-icon">🔊</span></div>
+                        <div class="card-options">
+                            <div class="opt-item" onmouseover="setAudioMode('zen')">ZEN MODE<span>BINAURAL BEATS</span></div>
+                            <div class="opt-item" onmouseover="setAudioMode('hiphop')">BOOM BAP<span>KICK SNARE HAT</span></div>
+                            <div class="opt-item" onmouseover="setAudioMode('triphop')">AMBIENT<span>DETUNED SAW</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lab-card" onmouseenter="startSceneViz()" onmouseleave="stopSceneViz()">
+                    <div class="visual-layer"><canvas id="viz-scene" class="viz-canvas"></canvas></div>
+                    <div class="card-content">
+                        <div class="card-head"><span>ATMOSPHERE</span><span class="card-icon">👁️</span></div>
+                        <div class="card-options">
+                            <div class="opt-item" onmouseover="setSceneMode('void')">VOID<span>MINIMALIST</span></div>
+                            <div class="opt-item" onmouseover="setSceneMode('concrete')">CONCRETE<span>URBAN GRID</span></div>
+                            <div class="opt-item" onmouseover="setSceneMode('fluid')">FLUID<span>CYBERNETIC</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lab-card" onmouseenter="startAvatar()" onmouseleave="stopAvatar()">
+                    <div class="visual-layer"><div id="avatar-3d-container"></div></div>
+                    <div class="card-content">
+                        <div class="card-head"><span>MOTION DATA</span><span class="card-icon">👤</span></div>
+                        <div class="card-options">
+                            <div class="opt-item" onmouseover="setAvatarMode('wingchun')">THE MONK<span>TAN SAO / FOOK SAO</span></div>
+                            <div class="opt-item" onmouseover="setAvatarMode('hiphop')">THE BREAKER<span>BOUNCE / GROOVE</span></div>
+                            <div class="opt-item" onmouseover="setAvatarMode('triphop')">THE GHOST<span>FLOAT / TWIST</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="chronos-section">
+            <div class="chronos-connector"></div>
+            <div class="gate-start-layer">
+                <button class="btn-activate" onclick="initChronosGate()">ACTIVATE CHRONOS GATE</button>
+            </div>
+            
+            <div class="gate-overlay">
+                <div class="gate-header">
+                    <div class="gate-title" id="gate-ui-title">CHRONOS HUB</div>
+                    <div class="gate-sub" id="gate-ui-sub">连接 · 过去与未来</div>
+                </div>
+                
+                <div class="gate-hud" id="gate-hud">
+                    <div class="gate-icon" id="gate-ui-icon">⛩️</div>
+                    <div class="gate-status" id="gate-ui-status">STANDBY</div>
+                </div>
+                <div class="gate-controls">
+                    <div class="gate-guide">
+                        👊 <b>CENTER:</b> HIP-HOP (BURST)<br>
+                        🌊 <b>SIDES:</b> TRIP-HOP (FLOW)<br>
+                        🧘 <b>STILL:</b> ZEN (RESET)
+                    </div>
+                    <div class="gate-monitor">
+                        <div class="monitor-screen"><video id="webcam-preview" autoplay muted playsinline></video></div>
+                        <div class="monitor-screen"><canvas id="motion-debug"></canvas></div>
+                    </div>
+                </div>
+            </div>
+            <div id="chronos-container"></div>
+        </section>
+
+        <section id="outro-summary">
+            <div id="outro-canvas-container"></div>
+        </section>
+    </div>
+
+    <div class="nav-fixed"><div class="nav-link" onclick="location.reload()">RESTART</div></div>
+    <canvas id="process-canvas"></canvas>
+
+    <script type="x-shader/x-vertex" id="vs-zen">
+        uniform float time; attribute float size; varying float vOpacity;
+        void main() {
+            vec3 pos = position; pos.y -= time * 5.0; pos.x += sin(time * 0.5 + pos.z * 0.05) * 5.0;
+            if (pos.y < -100.0) pos.y += 200.0;
+            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+            gl_PointSize = size * (300.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+            vOpacity = smoothstep(150.0, 0.0, -mvPosition.z);
+        }
+    </script>
+    <script type="x-shader/x-fragment" id="fs-zen">
+        uniform vec3 color; varying float vOpacity;
+        void main() { float d = distance(gl_PointCoord, vec2(0.5)); if(d > 0.5) discard; gl_FragColor = vec4(color, vOpacity * 0.5); }
+    </script>
+    <script type="x-shader/x-vertex" id="vs-hiphop">
+        uniform float time; uniform float uEnergy; attribute vec3 offset; attribute vec3 colorAttr; varying vec3 vColor;
+        void main() {
+            vec3 pos = offset; pos += sin(pos * 10.0 + time * 20.0) * uEnergy * 5.0;
+            float angle = time + length(pos.xy)*0.05; float c = cos(angle); float s = sin(angle); pos.xy = mat2(c, -s, s, c) * pos.xy;
+            vColor = colorAttr; gl_Position = projectionMatrix * modelViewMatrix * vec4(position + pos, 1.0);
+        }
+    </script>
+    <script type="x-shader/x-fragment" id="fs-hiphop">
+        varying vec3 vColor; void main() { gl_FragColor = vec4(vColor, 0.8); }
+    </script>
+    <script type="x-shader/x-vertex" id="vs-triphop">
+        uniform float time; uniform float uFlow; varying vec2 vUv;
+        void main() { vUv = uv; vec3 pos = position; float wave = sin(uv.x * 10.0 + time) * cos(uv.y * 10.0 + time); pos.z += wave * (5.0 + uFlow * 20.0); gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0); }
+    </script>
+    <script type="x-shader/x-fragment" id="fs-triphop">
+        uniform float time; varying vec2 vUv;
+        void main() { vec3 c1 = vec3(0.2, 0.0, 0.4); vec3 c2 = vec3(0.0, 0.8, 0.8); float p = sin(vUv.x * 20.0 + time) * sin(vUv.y * 20.0 - time); gl_FragColor = vec4(mix(c1, c2, p * 0.5 + 0.5), 0.6); }
+    </script>
+
+    <script>
+        // --- 系统初始化 ---
+        function initializeSystem() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.body.classList.add('flashing');
+            setTimeout(() => {
+                document.body.classList.remove('flashing');
+                document.body.classList.add('active');
+                updateVine();
+                // (已删除) initDripSystem(); 
+            }, 100);
+        }
+
+        // --- 1. 背景光流树 ---
+        const canvas = document.getElementById('soul-tree-canvas'); const ctx = canvas.getContext('2d');
+        let w, h; const tentacles = []; const numTentacles = 100; const spiritParticles = []; 
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; initTentacles(); updateVine(); }
+        window.addEventListener('resize', resize);
+        class Tentacle { constructor() { this.reset(); } reset() { this.x = w / 2 + (Math.random() - 0.5) * w * 0.6; this.y = h + Math.random() * 100; this.segments = []; this.numSegments = 60; this.segHeight = (h + 250) / this.numSegments; this.angleOffset = Math.random() * Math.PI * 2; this.waveSpeed = Math.random() * 0.015 + 0.005; this.colorBase = Math.random() > 0.5 ? '255, 174, 0' : '255, 69, 0'; this.thickness = Math.random() * 1.8 + 0.3; for(let i=0; i<this.numSegments; i++) { this.segments.push({ x: this.x, y: this.y - i * this.segHeight }); } } update(time) { for(let i=0; i<this.numSegments; i++) { const sway = Math.sin(time * this.waveSpeed + i * 0.08 + this.angleOffset) * (i * 0.6); this.segments[i].x = this.x + sway + (this.x - w/2) * (i/this.numSegments) * 0.8; } } draw() { ctx.beginPath(); ctx.moveTo(this.segments[0].x, this.segments[0].y); for(let i=1; i<this.numSegments - 1; i++) { const xc = (this.segments[i].x + this.segments[i+1].x) / 2; const yc = (this.segments[i].y + this.segments[i+1].y) / 2; ctx.quadraticCurveTo(this.segments[i].x, this.segments[i].y, xc, yc); } const gradient = ctx.createLinearGradient(this.x, h, this.x, 0); gradient.addColorStop(0, `rgba(${this.colorBase}, 0)`); gradient.addColorStop(0.3, `rgba(${this.colorBase}, 0.5)`); gradient.addColorStop(1, `rgba(${this.colorBase}, 0)`); ctx.strokeStyle = gradient; ctx.lineWidth = this.thickness; ctx.stroke(); } }
+        class Spirit { constructor() { this.reset(); } reset() { this.x = Math.random() * w; this.y = h + Math.random() * 100; this.vy = Math.random() * 0.8 + 0.2; this.size = Math.random() * 1.5; this.alpha = Math.random(); } update() { this.y -= this.vy; if(this.y < 0) this.reset(); } draw() { ctx.fillStyle = `rgba(255, 200, 100, ${this.alpha * 0.4})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); } }
+        function initTentacles() { tentacles.length = 0; spiritParticles.length = 0; for(let i=0; i<numTentacles; i++) tentacles.push(new Tentacle()); for(let i=0; i<60; i++) spiritParticles.push(new Spirit()); }
+        let globalTime = 0; function animateTree() { ctx.fillStyle = 'rgba(10, 5, 0, 0.1)'; ctx.fillRect(0, 0, w, h); ctx.globalCompositeOperation = 'lighter'; globalTime += 1; tentacles.forEach(t => { t.update(globalTime); t.draw(); }); spiritParticles.forEach(s => { s.update(); s.draw(); }); ctx.globalCompositeOperation = 'source-over'; requestAnimationFrame(animateTree); }
+        resize(); animateTree();
+
+        // --- 2. 藤蔓导航 ---
+        function updateVine() {
+            const container = document.querySelector('.vine-section'); const intro = document.getElementById('intro-anchor');
+            const n1 = document.getElementById('node-1'); const n2 = document.getElementById('node-2'); const n3 = document.getElementById('node-3');
+            if(!intro || !n1 || !n2 || !n3) return;
+            const getCenter = (el) => { const r = el.getBoundingClientRect(); const c = container.getBoundingClientRect(); return { x: r.left + r.width/2 - c.left, y: r.top + r.height/2 - c.top }; };
+            const p0 = { x: container.offsetWidth/2, y: intro.offsetTop + intro.offsetHeight }; const p1 = getCenter(n1); const p2 = getCenter(n2); const p3 = getCenter(n3);
+            const pathData = `M ${p0.x} ${p0.y} C ${p0.x} ${p0.y+150}, ${p1.x} ${p1.y-150}, ${p1.x} ${p1.y} S ${p2.x} ${p2.y-150}, ${p2.x} ${p2.y} S ${p3.x} ${p3.y-150}, ${p3.x} ${p3.y} L ${container.offsetWidth/2} ${container.offsetHeight}`;
+            document.getElementById('vine-bg').setAttribute('d', pathData); const vm = document.getElementById('vine-main'); vm.setAttribute('d', pathData);
+            const len = vm.getTotalLength(); vm.style.strokeDasharray = len;
+            document.getElementById('main-interface').addEventListener('scroll', (e) => {
+                const pct = e.target.scrollTop / (e.target.scrollHeight - window.innerHeight);
+                vm.style.strokeDashoffset = len - len * Math.min(pct * 2, 1);
+            });
+        }
+        const observer = new IntersectionObserver((e)=>{e.forEach(i=>{if(i.isIntersecting)i.target.classList.add('is-visible')})}, {threshold:0.3});
+        document.querySelectorAll('.node-block, .transition-title-block').forEach(b=>observer.observe(b));
+
+        // --- 3. 全息舞台 ---
+        (function() {
+            const container = document.getElementById('three-container'); const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / (window.innerHeight * 0.9), 0.1, 1000); camera.position.z = 120; camera.position.y = 10;
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight * 0.9); container.appendChild(renderer.domElement);
+            const video = document.createElement('video'); video.src = 'images/wingchun.mp4'; video.loop = true; video.muted = true; video.play().catch(e=>console.log("Video not found, using noise fallback")); video.setAttribute('playsinline', '');
+            const texture = new THREE.VideoTexture(video); texture.minFilter = THREE.LinearFilter;
+            const densityX = 400; const densityY = 200; const particleCount = densityX * densityY;
+            const geometry = new THREE.BufferGeometry(); const positions = new Float32Array(particleCount * 3); const uvs = new Float32Array(particleCount * 2);
+            let index = 0; const width = 180; const height = 100;
+            for (let y = 0; y < densityY; y++) { for (let x = 0; x < densityX; x++) { uvs[index * 2] = x / (densityX - 1); uvs[index * 2 + 1] = y / (densityY - 1); const xPos = (x / (densityX - 1) - 0.5) * width; const yPos = (y / (densityY - 1) - 0.5) * height; positions[index * 3] = xPos; positions[index * 3 + 1] = yPos; positions[index * 3 + 2] = 0; index++; } }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3)); geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+            const mat = new THREE.ShaderMaterial({
+                uniforms: { t: { value: texture }, time: { value: 0 }, colHigh: { value: new THREE.Color(0xffffff) }, colLow: { value: new THREE.Color(0xff4500) } },
+                vertexShader: `uniform sampler2D t; varying vec2 vUv; varying float vVis; void main() { vUv = uv; vec4 c = texture2D(t, uv); float b = (c.r + c.g + c.b) / 3.0; if(b < 0.1) b = sin(uv.x*10.0+uv.y*10.0)*0.1; vVis = smoothstep(0.05, 0.4, b); vec3 p = position; p.z += b * 40.0 * vVis; gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); gl_PointSize = (2.0 * vVis + 0.1); }`,
+                fragmentShader: `uniform vec3 colHigh; uniform vec3 colLow; uniform float time; varying float vVis; varying vec2 vUv; void main() { if (vVis < 0.1) discard; vec3 finalCol = mix(colLow, colHigh, smoothstep(0.4, 0.7, vVis)); float scan = sin(vUv.y * 5.0 - time * 3.0); if(scan > 0.95) finalCol = vec3(1.0); gl_FragColor = vec4(finalCol, vVis * 0.9); }`,
+                transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+            });
+            const particles = new THREE.Points(geometry, mat); scene.add(particles);
+            function animate() { requestAnimationFrame(animate); mat.uniforms.time.value += 0.02; renderer.render(scene, camera); }
+            animate();
+        })();
+
+        // --- LAB 1: AUDIO VIZ ---
+        let labCtx, analyser, labOsc, labLoop, currentAudioMode='zen';
+        function setAudioMode(mode) { currentAudioMode = mode; }
+        function startAudioPreview() {
+            if(!labCtx) { labCtx = new (window.AudioContext || window.webkitAudioContext)(); analyser = labCtx.createAnalyser(); analyser.fftSize = 64; analyser.connect(labCtx.destination); }
+            if(labCtx.state === 'suspended') labCtx.resume();
+            let beat = 0;
+            labLoop = setInterval(() => {
+                const t = labCtx.currentTime;
+                if(currentAudioMode === 'zen') {
+                   if(beat%8===0) { const o=labCtx.createOscillator(); o.frequency.value=220; const g=labCtx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.2,t+0.1); g.gain.exponentialRampToValueAtTime(0.01,t+2); o.connect(g); g.connect(analyser); o.start(); o.stop(t+2); }
+                } else if(currentAudioMode === 'hiphop') {
+                   if(beat%4===0) { const o=labCtx.createOscillator(); o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(0.01,t+0.3); const g=labCtx.createGain(); g.gain.setValueAtTime(1,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.3); o.connect(g); g.connect(analyser); o.start(); o.stop(t+0.3); }
+                   if(beat%2===1) { const o=labCtx.createOscillator(); o.type='square'; o.frequency.value=800; const g=labCtx.createGain(); g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.05); o.connect(g); g.connect(analyser); o.start(); o.stop(t+0.05); }
+                } else {
+                   const o=labCtx.createOscillator(); o.type='sawtooth'; o.frequency.value=174+Math.random()*2; const f=labCtx.createBiquadFilter(); f.frequency.value=300; const g=labCtx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.1,t+0.5); g.gain.linearRampToValueAtTime(0,t+1); o.connect(f); f.connect(g); g.connect(analyser); o.start(); o.stop(t+1);
+                }
+                beat++;
+            }, 250);
+            renderAudioViz();
+        }
+        function stopAudioPreview() { if(labLoop) clearInterval(labLoop); }
+        function renderAudioViz() {
+            const cvs = document.getElementById('viz-audio');
+            if(!cvs || !analyser) return;
+            const c = cvs.getContext('2d'); cvs.width=cvs.offsetWidth; cvs.height=cvs.offsetHeight;
+            const data = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(data);
+            c.clearRect(0,0,cvs.width,cvs.height); c.fillStyle = '#ffae00';
+            const bw = cvs.width/data.length;
+            for(let i=0; i<data.length; i++) {
+                const h = (data[i]/255)*cvs.height;
+                if(currentAudioMode==='zen') { c.beginPath(); c.arc(cvs.width/2, cvs.height/2, h/2, 0, Math.PI*2); c.strokeStyle='#ffae00'; c.stroke(); }
+                else if(currentAudioMode==='hiphop') c.fillRect(i*bw, cvs.height-h, bw-2, h);
+                else { c.beginPath(); c.arc(i*bw, cvs.height/2 + (Math.random()-0.5)*h, 2, 0, Math.PI*2); c.fill(); }
+            }
+            if(labLoop) requestAnimationFrame(renderAudioViz);
+        }
+
+        // --- LAB 2: SCENE VIZ ---
+        let sceneAnim, currentSceneMode='void';
+        function setSceneMode(mode) { currentSceneMode=mode; }
+        function startSceneViz() { renderSceneViz(); }
+        function stopSceneViz() { cancelAnimationFrame(sceneAnim); }
+        function renderSceneViz() {
+            const cvs = document.getElementById('viz-scene'); const c = cvs.getContext('2d');
+            cvs.width=cvs.offsetWidth; cvs.height=cvs.offsetHeight;
+            c.clearRect(0,0,cvs.width,cvs.height);
+            const t = Date.now()*0.001;
+            c.fillStyle='#fff'; c.strokeStyle='#ffae00';
+            if(currentSceneMode==='void') { c.beginPath(); c.arc(cvs.width/2, cvs.height/2, 50+Math.sin(t)*10, 0, Math.PI*2); c.stroke(); }
+            else if(currentSceneMode==='concrete') { for(let i=0;i<10;i++) c.strokeRect(cvs.width/2-50+Math.sin(t+i)*20, cvs.height/2-50+Math.cos(t+i)*20, 100, 100); }
+            else { c.beginPath(); for(let x=0; x<cvs.width; x+=10) c.lineTo(x, cvs.height/2 + Math.sin(t*2 + x*0.05)*30); c.stroke(); }
+            sceneAnim = requestAnimationFrame(renderSceneViz);
+        }
+
+        // --- LAB 3: 3D AVATAR ---
+        let avScene, avCam, avRen, avRobot, avAnimId, currentAvatarMode='wingchun';
+        function initLab3D() {
+            const cont = document.getElementById('avatar-3d-container');
+            avScene = new THREE.Scene();
+            avCam = new THREE.PerspectiveCamera(50, cont.offsetWidth/cont.offsetHeight, 0.1, 100); avCam.position.set(0, 10, 40);
+            avRen = new THREE.WebGLRenderer({alpha:true, antialias:true}); avRen.setSize(cont.offsetWidth, cont.offsetHeight);
+            cont.appendChild(avRen.domElement);
+            avRobot = new THREE.Group();
+            const mat = new THREE.MeshBasicMaterial({color:0xffae00, wireframe:true});
+            const createLimb = (w,h,d,y) => { const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat); m.position.y=y; return m; }
+            const torso = createLimb(6,10,4, 5); avRobot.add(torso);
+            const head = createLimb(4,5,4, 14); avRobot.add(head);
+            const lArm = new THREE.Group(); lArm.position.set(-4,9,0); const lArmMesh = createLimb(2,8,2, -4); lArm.add(lArmMesh); avRobot.add(lArm);
+            const rArm = new THREE.Group(); rArm.position.set(4,9,0); const rArmMesh = createLimb(2,8,2, -4); rArm.add(rArmMesh); avRobot.add(rArm);
+            const lLeg = new THREE.Group(); lLeg.position.set(-2,0,0); const lLegMesh = createLimb(2.5,10,2.5, -5); lLeg.add(lLegMesh); avRobot.add(lLeg);
+            const rLeg = new THREE.Group(); rLeg.position.set(2,0,0); const rLegMesh = createLimb(2.5,10,2.5, -5); rLeg.add(rLegMesh); avRobot.add(rLeg);
+            avRobot.parts = {head, lArm, rArm, lLeg, rLeg}; avScene.add(avRobot);
+        }
+        function setAvatarMode(mode) { currentAvatarMode = mode; }
+        function startAvatar() { if(!avScene) initLab3D(); animateAvatar(); }
+        function stopAvatar() { cancelAnimationFrame(avAnimId); }
+        function animateAvatar() {
+            avAnimId = requestAnimationFrame(animateAvatar);
+            const t = Date.now() * 0.005; const p = avRobot.parts;
+            if(currentAvatarMode === 'wingchun') { p.lArm.rotation.z = -0.5; p.lArm.rotation.x = Math.sin(t)*0.2 - 0.5; p.rArm.rotation.z = 0.5; p.rArm.rotation.x = Math.cos(t)*0.2 - 0.5; p.lLeg.rotation.x = 0; p.rLeg.rotation.x = 0; avRobot.position.y = 0; }
+            else if(currentAvatarMode === 'hiphop') { const bounce = Math.abs(Math.sin(t*2)); avRobot.position.y = bounce * 2; p.lArm.rotation.z = Math.sin(t)*0.5 - 1; p.lArm.rotation.x = 0; p.rArm.rotation.z = -Math.sin(t)*0.5 + 1; p.rArm.rotation.x = 0; p.lLeg.rotation.x = -bounce*0.5; p.rLeg.rotation.x = -bounce*0.5; }
+            else { avRobot.position.y = Math.sin(t)*2 + 2; avRobot.rotation.z = Math.sin(t*0.5)*0.2; p.lArm.rotation.z = -2 + Math.sin(t)*0.5; p.rArm.rotation.z = 2 + Math.cos(t)*0.5; p.lLeg.rotation.x = Math.sin(t)*0.2; p.rLeg.rotation.x = Math.cos(t)*0.2; }
+            avRen.render(avScene, avCam);
+        }
+
+        // --- 4. 任意门 (CHRONOS GATE) ---
+        let chronosRunning = false;
+        let cScene, cCam, cRenderer, cClock;
+        let cGroups = [], hiphopU, triphopU;
+        let audioCtx, zenNodes=[], triphopNodes=[], hiphopTimer=null;
+        const WORLDS = { ZEN: 0, HIPHOP: 1, TRIPHOP: 2 };
+        let curWorld = WORLDS.ZEN;
+        const videoEl = document.getElementById('webcam-preview');
+        const mCanvas = document.getElementById('process-canvas'); const mCtx = mCanvas.getContext('2d', {willReadFrequently:true});
+        const dCanvas = document.getElementById('motion-debug'); const dCtx = dCanvas.getContext('2d');
+        let lastFrame = null; let eCenter=0, eEdge=0, sTimer=0;
+        // [修复] 新增可见性追踪变量
+        let isChronosVisible = false;
+        
+        async function initChronosGate() {
+            document.querySelector('.gate-start-layer').classList.add('hidden');
+            document.querySelector('.gate-hud').classList.add('active');
+            document.querySelector('.gate-controls').classList.add('visible');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 160, height: 120 }, audio: false });
+                videoEl.srcObject = stream;
+                mCanvas.width = 32; mCanvas.height = 24; dCanvas.width = 32; dCanvas.height = 24;
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                const container = document.getElementById('chronos-container');
+                cClock = new THREE.Clock(); cScene = new THREE.Scene();
+                cCam = new THREE.PerspectiveCamera(65, container.offsetWidth/container.offsetHeight, 0.1, 2000); cCam.position.z = 100;
+                cRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); cRenderer.setSize(container.offsetWidth, container.offsetHeight);
+                container.appendChild(cRenderer.domElement);
+
+                createZenWorld(); createHipHopWorld(); createTripHopWorld();
+                
+                // (已删除) 确保滴落效果已初始化
+
+                chronosRunning = true; 
+                cAnimate(); cMotionLoop(); 
+                // [修复] 移除立即播放，交由观察器处理
+
+                const gateSection = document.querySelector('.chronos-section');
+                const audioObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(e => {
+                        if(!chronosRunning) return;
+                        // [修复] 更新可见性状态
+                        isChronosVisible = e.isIntersecting;
+
+                        if(e.isIntersecting) { 
+                            if(audioCtx.state === 'suspended') audioCtx.resume(); 
+                            // [修复] 进入时播放当前世界的音频
+                            startWorldAudio(curWorld); 
+                        } else { 
+                            stopZenAudio(); stopHipHopAudio(); stopTripHopAudio(); 
+                        }
+                    });
+                }, { threshold: 0.1 });
+                audioObserver.observe(gateSection);
+            } catch (e) { console.error(e); alert("请检查相机权限"); }
+        }
+
+        // (已删除) 钟乳石滴落系统 (STALACTITE DRIP SYSTEM) 相关代码
+
+        // --- AUDIO ENGINES (UNCHANGED) ---
+        function startZenAudio() {
+            const createDrone = (freq) => { const osc = audioCtx.createOscillator(); osc.frequency.value = freq; const gain = audioCtx.createGain(); gain.gain.value = 0.05; osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); return {o:osc, g:gain}; };
+            zenNodes.push(createDrone(110)); zenNodes.push(createDrone(112));
+            const bowlLoop = setInterval(() => { const t = audioCtx.currentTime; [220, 540, 800].forEach(f => { const o = audioCtx.createOscillator(); o.frequency.value = f; const g = audioCtx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.1, t + 0.1); g.gain.exponentialRampToValueAtTime(0.001, t + 6); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(t + 6); }); }, 8000);
+            zenNodes.push({interval: bowlLoop});
+        }
+        function stopZenAudio() { zenNodes.forEach(n => { if(n.o) { n.g.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5); setTimeout(()=>n.o.stop(), 500); } if(n.interval) clearInterval(n.interval); }); zenNodes = []; }
+        function playKick(t) { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.5); gain.gain.setValueAtTime(1, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.5); }
+        function playSnare(t) { const bufferSize = audioCtx.sampleRate * 0.2; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i=0; i<bufferSize; i++) data[i]=(Math.random()*2-1); const noise = audioCtx.createBufferSource(); noise.buffer = buffer; const filter = audioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 1000; const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.8, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2); noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start(t); }
+        function playHat(t) { const bufferSize = audioCtx.sampleRate * 0.05; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i=0; i<bufferSize; i++) data[i]=(Math.random()*2-1); const noise = audioCtx.createBufferSource(); noise.buffer = buffer; const filter = audioCtx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 5000; const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.3, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05); noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start(t); }
+        function startHipHopAudio() { let beat = 0; const stepTime = 60/90/2; hiphopTimer = setInterval(() => { const t = audioCtx.currentTime; if(beat%8 === 0) playKick(t); if(beat%8 === 2) playHat(t); if(beat%8 === 4) { playSnare(t); playKick(t+0.1); } if(beat%8 === 6) playHat(t); beat++; }, stepTime * 1000); }
+        function stopHipHopAudio() { clearInterval(hiphopTimer); }
+        function startTripHopAudio() { const freqs = [174.61, 207.65, 261.63, 311.13]; const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400; const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.2; const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 200; lfo.connect(lfoGain); lfoGain.connect(filter.frequency); const masterG = audioCtx.createGain(); masterG.gain.value = 0; filter.connect(masterG); masterG.connect(audioCtx.destination); freqs.forEach(f => { const osc = audioCtx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = f + (Math.random()-0.5)*2; osc.connect(filter); osc.start(); triphopNodes.push(osc); }); lfo.start(); triphopNodes.push(lfo); triphopNodes.push(masterG); masterG.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 2); }
+        function stopTripHopAudio() { if(triphopNodes.length>0) { const g = triphopNodes[triphopNodes.length-1]; if(g && g.gain) g.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5); setTimeout(() => { triphopNodes.forEach(n => { try{n.stop()}catch(e){} }); triphopNodes=[]; }, 1000); } }
+        function startWorldAudio(idx) { stopZenAudio(); stopHipHopAudio(); stopTripHopAudio(); if(idx === 0) startZenAudio(); if(idx === 1) startHipHopAudio(); if(idx === 2) startTripHopAudio(); }
+
+        // --- WORLD LOGIC ---
+        function createZenWorld() {
+            const g = new THREE.Group(); cGroups.push(g);
+            const geo = new THREE.BufferGeometry(); const pos=[], size=[];
+            for(let i=0;i<1000;i++){ pos.push((Math.random()-0.5)*300,(Math.random()-0.5)*300,(Math.random()-0.5)*200); size.push(Math.random()*4+2); }
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3)); geo.setAttribute('size', new THREE.Float32BufferAttribute(size,1));
+            g.add(new THREE.Points(geo, new THREE.ShaderMaterial({ uniforms:{time:{value:0}, color:{value:new THREE.Color(0xffccaa)}}, vertexShader:document.getElementById('vs-zen').textContent, fragmentShader:document.getElementById('fs-zen').textContent, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false })));
+            cScene.add(g);
+        }
+        function createHipHopWorld() {
+            const g = new THREE.Group(); cGroups.push(g);
+            const base = new THREE.TetrahedronGeometry(4); const geo = new THREE.InstancedBufferGeometry();
+            geo.index = base.index; geo.attributes.position = base.attributes.position;
+            const off=[], col=[]; for(let i=0;i<500;i++){ off.push((Math.random()-0.5)*200,(Math.random()-0.5)*200,(Math.random()-0.5)*200); col.push(Math.random()>0.5?1:0, 0, Math.random()>0.5?0:1); }
+            geo.setAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(off),3)); geo.setAttribute('colorAttr', new THREE.InstancedBufferAttribute(new Float32Array(col),3));
+            hiphopU = {time:{value:0}, uEnergy:{value:0}};
+            g.add(new THREE.Mesh(geo, new THREE.ShaderMaterial({uniforms:hiphopU, vertexShader:document.getElementById('vs-hiphop').textContent, fragmentShader:document.getElementById('fs-hiphop').textContent, transparent:true, blending:THREE.AdditiveBlending})));
+            cScene.add(g); g.visible=false;
+        }
+        function createTripHopWorld() {
+            const g = new THREE.Group(); cGroups.push(g);
+            const geo = new THREE.PlaneGeometry(400,400,60,60); triphopU = {time:{value:0}, uFlow:{value:0}};
+            const m = new THREE.Mesh(geo, new THREE.ShaderMaterial({uniforms:triphopU, vertexShader:document.getElementById('vs-triphop').textContent, fragmentShader:document.getElementById('fs-triphop').textContent, transparent:true, opacity:0.6, wireframe:true}));
+            m.rotation.x=-Math.PI/2; m.position.y=-50; g.add(m); cScene.add(g); g.visible=false;
+        }
+        function switchWorld(idx) {
+            if(curWorld===idx) return;
+            curWorld = idx;
+            const ui = [ {t:"ZEN REALM", s:"中式禅修 · 颂钵", c:"#000", i:"⛩️"}, {t:"THE BRONX", s:"嘻哈街头 · 律动", c:"#100", i:"🔥"}, {t:"VOID CLUB", s:"神游舞池 · 迷幻", c:"#001", i:"🌌"} ][idx];
+            document.getElementById('gate-ui-title').innerText = ui.t; document.getElementById('gate-ui-sub').innerText = ui.s;
+            document.getElementById('gate-ui-icon').innerText = ui.i; document.querySelector('.chronos-section').style.backgroundColor = ui.c;
+            cGroups.forEach((g,i)=>g.visible=(i===idx));
+            
+            // [修复] 只有在可见时才开始播放新世界的音频
+            if(isChronosVisible) {
+                startWorldAudio(idx);
+            }
+            eCenter=0; eEdge=0; sTimer=0;
+        }
+        function cAnimate() { if(!chronosRunning) return; requestAnimationFrame(cAnimate); const t = cClock.getElapsedTime(); if(curWorld===0) cGroups[0].children[0].material.uniforms.time.value = t; if(curWorld===1) hiphopU.time.value = t; if(curWorld===2) triphopU.time.value = t; cRenderer.render(cScene, cCam); }
+        function cMotionLoop() {
+            if(!chronosRunning) { requestAnimationFrame(cMotionLoop); return; }
+            const w=32, h=24; mCtx.drawImage(videoEl, 0, 0, w, h); const frame = mCtx.getImageData(0,0,w,h); dCtx.fillStyle='#000'; dCtx.fillRect(0,0,w,h);
+            if(lastFrame) {
+                let center=0, edge=0, total=0;
+                for(let i=0; i<frame.data.length; i+=4) {
+                    if(Math.abs(frame.data[i]-lastFrame.data[i]) > 20) { total++; const p=i/4; const x=p%w; const y=Math.floor(p/w); dCtx.fillStyle='#0f0'; dCtx.fillRect(x,y,1,1); if(x>w*0.35 && x<w*0.65 && y>h*0.35 && y<h*0.65) center++; else if(x<w*0.2 || x>w*0.8) edge++; }
+                }
+                if(total<5) { sTimer++; if(sTimer>60 && curWorld!==0) switchWorld(0); } 
+                else { sTimer=0; if(center>10 && curWorld!==1) { eCenter++; if(eCenter>5) switchWorld(1); } else eCenter=0; if(edge>10 && curWorld!==2) { eEdge++; if(eEdge>8) switchWorld(2); } else eEdge=0; }
+                if(curWorld===1 && center>5) hiphopU.uEnergy.value=1; else if(curWorld===1) hiphopU.uEnergy.value*=0.9;
+                if(curWorld===2 && edge>5) triphopU.uFlow.value=1; else if(curWorld===2) triphopU.uFlow.value*=0.95;
+            }
+            lastFrame = frame; requestAnimationFrame(cMotionLoop);
+        }
+
+        // --- 5. 结尾灵体 (纯粹粒子团版 - 修复白底可见性) ---
+        (function() {
+            const container = document.getElementById('outro-canvas-container');
+            if(!container) return;
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xffffff); // 纯白背景
+
+            // 相机位置 - 居中平视，稍微拉近一点
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 25);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            // [修复] 材质：改用正常混合模式，以便在白底上清晰显示
+            const particleMaterial = new THREE.PointsMaterial({
+                color: 0xff4500,
+                size: 0.6, // [修复] 加大尺寸
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.NormalBlending, // [修复] 改为正常混合
+                depthWrite: false
+            });
+
+            // 生成粒子团几何体
+            const particleCount = 800; // 数量不多，保持稀疏感
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const radius = 7; // 团簇半径范围
+
+            for (let i = 0; i < particleCount; i++) {
+                // 在球体内随机分布生成点
+                const u = Math.random();
+                const v = Math.random();
+                const theta = 2 * Math.PI * u;
+                const phi = Math.acos(2 * v - 1);
+                // 使用随机半径，让中心稍微密集一点，边缘稀疏
+                const r = Math.random() * radius; 
+
+                // 球坐标转笛卡尔坐标
+                const x = r * Math.sin(phi) * Math.cos(theta);
+                const y = r * Math.sin(phi) * Math.sin(theta);
+                const z = r * Math.cos(phi);
+                positions.push(x, y, z);
+            }
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            
+            // 创建粒子云对象并添加到场景中心
+            const particleCloud = new THREE.Points(geometry, particleMaterial);
+            scene.add(particleCloud);
+
+            // --- 动画循环 ---
+            function animateCluster() {
+                requestAnimationFrame(animateCluster);
+                const t = Date.now() * 0.0005; // 时间系数
+
+                // 1. 缓慢的多轴自转，营造漂浮感
+                particleCloud.rotation.y = t * 0.8;
+                particleCloud.rotation.z = t * 0.5;
+
+                // 2. 轻微的上下浮动呼吸感
+                particleCloud.position.y = Math.sin(t * 1.5) * 0.5;
+
+                // 3. 轻微的整体缩放呼吸感
+                const scale = 1 + Math.sin(t * 2) * 0.03;
+                particleCloud.scale.set(scale, scale, scale);
+
+                renderer.render(scene, camera);
+            }
+            animateCluster();
+
+            // 窗口大小调整适应
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        })();
+    </script>
+</body>
+</html>
