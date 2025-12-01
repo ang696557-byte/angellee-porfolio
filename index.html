@@ -3,29 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIND & VOID | ROOTED / LEVITATING</title>
+    <title>MIND & VOID | SYNTHESIS</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Noto+Sans:wght@100;300;400&family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Noto+Serif:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Syncopate:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&family=Noto+Serif:wght@700&display=swap');
 
-        /* --- 0. Global Settings --- */
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #020202; font-family: 'Noto Sans', sans-serif; color: #fff; overflow-x: hidden; cursor: none; }
+        /* --- 0. Global Settings (Main Page) --- */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #020202; font-family: 'Noto Sans SC', sans-serif; color: #fff; overflow-x: hidden; cursor: none; }
         ::-webkit-scrollbar { width: 0; }
 
-        /* --- 1. Film Grain Overlay --- */
+        /* --- 1. Main Page Styles --- */
         .film-grain {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998; opacity: 0.08;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
             animation: grain-move 8s steps(10) infinite;
         }
-        @keyframes grain-move { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-5%, -5%); } 20% { transform: translate(-10%, 5%); } 30% { transform: translate(5%, -10%); } 40% { transform: translate(-5%, 15%); } 50% { transform: translate(-10%, 5%); } 60% { transform: translate(15%, 0); } 70% { transform: translate(0, 10%); } 80% { transform: translate(-15%, 0); } 90% { transform: translate(10%, 5%); } }
+        @keyframes grain-move { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-5%, -5%); } 50% { transform: translate(-10%, 5%); } 90% { transform: translate(10%, 5%); } }
 
-        /* --- 2. Digital Wisp --- */
         #wisp-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9990; mix-blend-mode: screen; }
 
-        /* --- 3. Audio Toggle UI --- */
         #audio-toggle {
             position: fixed; bottom: 30px; left: 40px; z-index: 100; font-family: 'Syncopate'; font-size: 10px; color: rgba(255,255,255,0.5); cursor: pointer; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; transition: 0.3s; mix-blend-mode: difference;
         }
@@ -36,10 +34,8 @@
         #audio-toggle.muted .eq-bar { animation: none; height: 2px; }
         @keyframes eq-bounce { 0% { transform: scaleY(0.5); } 100% { transform: scaleY(1.5); } }
 
-        /* --- 4. Credits --- */
-        .credits-fixed { position: fixed; bottom: 10px; width: 100%; text-align: center; font-family: 'Noto Sans', sans-serif; font-size: 10px; letter-spacing: 1px; color: rgba(255, 255, 255, 0.6); z-index: 200; pointer-events: none; mix-blend-mode: difference; text-transform: uppercase; }
+        .credits-fixed { position: fixed; bottom: 10px; width: 100%; text-align: center; font-family: 'Noto Sans SC', sans-serif; font-size: 10px; letter-spacing: 1px; color: rgba(255, 255, 255, 0.6); z-index: 200; pointer-events: none; mix-blend-mode: difference; text-transform: uppercase; }
 
-        /* --- Existing Styles --- */
         #soul-tree-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; mix-blend-mode: screen; opacity: 0; transition: opacity 0.5s; }
         body.active #soul-tree-canvas { opacity: 0.6; }
         .ambient-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 100%, #2a1500 0%, #000 75%); z-index: -1; }
@@ -55,29 +51,51 @@
         body.active #main-interface { opacity: 1; pointer-events: auto; }
         
         .tree-header { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; z-index: 10; padding: 0 20px; }
-        .neon-title { font-family: 'Orbitron'; font-weight: 900; font-size: 8vw; line-height: 1.1; color: transparent; -webkit-text-stroke: 2px #ffae00; text-align: center; margin-bottom: 50px; text-shadow: 0 0 20px #ffae00; animation: jellyfish 6s ease-in-out infinite; }
+        .neon-title { font-family: 'Orbitron'; font-weight: 900; font-size: 8vw; line-height: 1.1; color: transparent; -webkit-text-stroke: 2px #ffae00; text-align: center; margin-bottom: 40px; text-shadow: 0 0 20px #ffae00; animation: jellyfish 6s ease-in-out infinite; }
         @keyframes jellyfish { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        .header-monologue { font-family: 'Share Tech Mono', monospace; font-size: 14px; line-height: 2; color: rgba(255, 255, 255, 0.8); text-align: left; max-width: 600px; margin: 0 auto; border-left: 2px solid #ff4500; padding-left: 20px; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(90deg, rgba(255,69,0,0.1) 0%, transparent 100%); }
+        
+        .header-monologue {
+            font-family: 'Noto Sans SC', sans-serif; font-weight: 300; font-size: 14px; line-height: 1.8; color: rgba(255, 255, 255, 0.85); text-align: center; max-width: 900px; margin: 0 auto; letter-spacing: 1.5px; text-transform: uppercase;
+        }
+        .header-monologue p { margin: 8px 0; }
 
-        .content-stream { position: relative; max-width: 1000px; margin: 0 auto; padding-bottom: 100px; }
-        .vine-section { position: relative; padding-top: 20vh; padding-bottom: 15vh; max-width: 1600px; margin: 0 auto; z-index: 1; }
+        .content-stream { position: relative; max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
+        .vine-section { position: relative; padding-top: 10vh; padding-bottom: 15vh; max-width: 1400px; margin: 0 auto; z-index: 1; }
         #global-vine-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
         .vine-path-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 12px; stroke-linecap: round; }
         .vine-path-main { fill: none; stroke: url(#vineGradient); stroke-width: 8px; stroke-linecap: round; filter: drop-shadow(0 0 10px #ff4500); stroke-dasharray: 3000; stroke-dashoffset: 3000; transition: stroke-dashoffset 0.1s linear; }
 
-        .intro-wide-block { width: 90%; max-width: 1200px; height: 350px; margin: 0 auto 80px auto; position: relative; z-index: 5; }
+        .intro-wide-block { width: 90%; max-width: 1200px; height: 350px; margin: 0 auto 20px auto; position: relative; z-index: 5; }
         .intro-img-box { width: 100%; height: 100%; overflow: hidden; border: 1px solid rgba(255, 174, 0, 0.5); border-radius: 4px; background: #000; }
         .intro-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
-        .node-block { display: flex; justify-content: center; align-items: center; margin-bottom: 60px; position: relative; z-index: 2; gap: 80px; opacity: 0; transform: translateY(50px); transition: all 1s; }
+        .section-divider {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            margin: 150px 0 100px 0; opacity: 0; transform: translateY(20px); transition: all 1s ease; position: relative; z-index: 5;
+        }
+        .section-divider.is-visible { opacity: 1; transform: translateY(0); }
+        
+        .mini-door {
+            width: 70px; height: 140px; background-color: #ffae00; box-shadow: 0 0 40px #ffae00, 0 0 80px #ff4500; margin-bottom: 40px; position: relative; animation: door-pulse 3s infinite alternate;
+        }
+        .mini-door::after { content: ''; position: absolute; top: 50%; right: 6px; width: 6px; height: 6px; background: #000; border-radius: 50%; }
+        @keyframes door-pulse { 0% { box-shadow: 0 0 30px #ffae00; opacity: 0.8; transform: scale(1); } 100% { box-shadow: 0 0 80px #ffae00, 0 0 20px #fff; opacity: 1; transform: scale(1.05); } }
+        
+        .divider-text { font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 4px; color: rgba(255,255,255,0.95); text-transform: uppercase; text-shadow: 0 0 20px rgba(255, 174, 0, 0.5); text-align: center; }
+
+        .node-block { display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 100px; position: relative; z-index: 2; gap: 60px; opacity: 0; transform: translateY(50px); transition: all 1s; padding: 0 40px; }
         .node-block.is-visible { opacity: 1; transform: translateY(0); }
-        .node-block:nth-child(odd) { flex-direction: row; } .node-block:nth-child(even) { flex-direction: row-reverse; }
-        .node-meta { width: 30%; min-width: 250px; }
-        .meta-id { font-family: 'Cinzel'; font-size: 60px; color: #ffae00; display: block; margin-bottom: 10px; }
-        .meta-title { font-family: 'Noto Sans'; font-size: 20px; font-weight: 300; letter-spacing: 5px; color: #fff; margin: 0 0 5px 0; text-transform: uppercase; }
-        .meta-sub { font-family: 'Syncopate'; font-size: 10px; color: #ff4500; letter-spacing: 2px; display: block; margin-bottom: 10px; }
-        .meta-desc { color: #aaa; font-size: 12px; line-height: 1.6; font-weight: 300; }
-        .node-visual { width: 350px; perspective: 800px; }
+        .node-meta { width: 45%; min-width: 300px; }
+        .node-visual { width: 50%; perspective: 800px; }
+
+        .meta-title-bilingual { font-family: 'Noto Sans SC', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.2; margin-bottom: 25px; color: #fff; }
+        .meta-title-bilingual small { display: block; font-family: 'Orbitron', sans-serif; font-size: 14px; margin-top: 8px; letter-spacing: 2px; opacity: 0.9; }
+        #node-1 .meta-title-bilingual small { color: #ffae00; text-shadow: 0 0 10px rgba(255,174,0,0.5); }
+        #node-2 .meta-title-bilingual small { color: #ff4500; text-shadow: 0 0 10px rgba(255,69,0,0.5); }
+        #node-3 .meta-title-bilingual small { color: #00aaff; text-shadow: 0 0 10px rgba(0,170,255,0.5); }
+
+        .meta-desc-bilingual { font-family: 'Noto Sans SC', sans-serif; font-size: 14px; font-weight: 300; line-height: 1.8; color: rgba(255, 255, 255, 0.85); border-left: 2px solid rgba(255,255,255,0.15); padding-left: 20px; }
+        .meta-desc-bilingual .en-text { display: block; font-family: 'Share Tech Mono', monospace; font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-top: 15px; line-height: 1.6; }
 
         .cyber-screen { width: 100%; aspect-ratio: 4/3; position: relative; overflow: hidden; background: #000; transition: box-shadow 0.3s; }
         #node-1 .cyber-screen { box-shadow: 0 0 25px rgba(255, 174, 0, 0.3); border: 1px solid rgba(255, 174, 0, 0.2); }
@@ -89,85 +107,577 @@
         .node-visual:hover .slide { filter: brightness(1.1) contrast(1.1); }
         .node-visual:hover .screen-overlay { opacity: 0.3; }
 
-        .transition-title-block { text-align: center; margin: 150px 0 50px 0; opacity: 0; transform: translateY(30px); transition: 1s; }
-        .transition-title-block.is-visible { opacity: 1; transform: translateY(0); }
-        .trans-title { font-family: 'Orbitron'; font-size: 60px; color: #fff; letter-spacing: 10px; text-shadow: 0 0 30px rgba(255, 174, 0, 0.6); }
-
         #hologram-stage { position: relative; width: 100vw; height: 100vh; margin: 80px 0; background: radial-gradient(circle at center, rgba(255, 69, 0, 0.05) 0%, transparent 60%); overflow: hidden; border-top: 1px solid rgba(255, 69, 0, 0.4); border-bottom: 1px solid rgba(255, 69, 0, 0.4); }
         #three-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
         .holo-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
         .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: #ffae00; box-shadow: 0 0 10px #ffae00; animation: scan-move 4s linear infinite; opacity: 0.5; }
         @keyframes scan-move { 0% { top: 0%; opacity: 0; } 100% { top: 100%; opacity: 0; } }
 
-        #synthesis-lab { position: relative; width: 100%; padding: 120px 0; background: #050505; border-top: 1px solid #222; border-bottom: 1px solid #222; z-index: 15; display: flex; flex-direction: column; align-items: center; }
-        .lab-connector { position: absolute; top: -50px; left: 50%; width: 2px; height: 100px; background: linear-gradient(to bottom, #ff4500, #ffae00); box-shadow: 0 0 10px #ffae00; z-index: 5; }
-        .lab-title-box { text-align: center; margin-bottom: 60px; position: relative; z-index: 2; }
-        .lab-sub { font-family: 'Share Tech Mono'; color: #ff4500; letter-spacing: 3px; font-size: 12px; }
-        .lab-main-title { font-family: 'Orbitron'; color: #fff; font-size: 32px; letter-spacing: 6px; margin: 10px 0; text-shadow: 0 0 15px rgba(255, 174, 0, 0.3); }
-        .lab-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; width: 95%; max-width: 1400px; }
-        .lab-card { width: 350px; height: 500px; border: 1px solid #333; background: #0a0a0a; position: relative; overflow: hidden; transition: 0.3s; }
-        .lab-card:hover { border-color: #ffae00; box-shadow: 0 0 40px rgba(255, 69, 0, 0.2); }
-        .card-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; z-index: 10; pointer-events: none; }
-        .card-head { font-family: 'Syncopate'; font-weight: 700; color: #888; border-bottom: 1px solid #333; padding-bottom: 15px; display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .card-icon { color: #ff4500; }
-        .card-options { pointer-events: auto; display: flex; flex-direction: column; gap: 15px; margin-top: auto; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 4px; border: 1px solid #333; transform: translateY(0); transition: 0.3s; }
-        .lab-card:hover .card-options { border-color: #555; }
-        .opt-item { font-family: 'Orbitron'; font-size: 14px; color: #888; letter-spacing: 2px; cursor: pointer; padding: 10px; border-left: 2px solid transparent; transition: 0.2s; background: rgba(255,255,255,0.02); }
-        .opt-item:hover, .opt-item.active { color: #ffae00; border-left: 2px solid #ffae00; background: rgba(255, 174, 0, 0.1); padding-left: 15px; }
-        .opt-item span { display: block; font-family: 'Noto Sans'; font-size: 10px; color: #555; letter-spacing: 0; margin-top: 2px; }
-        .visual-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.4; transition: opacity 0.3s; }
-        .lab-card:hover .visual-layer { opacity: 1; }
-        .viz-canvas { width: 100%; height: 100%; display: block; }
-        #avatar-3d-container { width: 100%; height: 100%; }
+        /* ========================================= */
+        /* --- GRAFFITI WALL STYLES (VOID TERMINAL) --- */
+        /* ========================================= */
+        #graffiti-wall-section {
+            position: relative;
+            width: 100%;
+            padding: 120px 0;
+            display: flex; justify-content: center; align-items: center;
+            overflow: visible;
+        }
 
-        .chronos-section { position: relative; width: 100%; height: 100vh; background: #000; border-top: 1px solid #333; z-index: 20; display: flex; flex-direction: column; transition: background-color 1s ease; overflow: visible !important; }
-        .chronos-connector { position: absolute; top: 0; left: 50%; width: 2px; height: 50px; background: linear-gradient(to bottom, #ffae00, transparent); z-index: 25; }
-        #chronos-container { width: 100%; flex-grow: 1; position: relative; }
-        .gate-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 30px; box-sizing: border-box; }
-        .gate-header { text-align: center; margin-top: 20px; }
-        .gate-title { font-family: 'Orbitron'; font-size: 30px; letter-spacing: 8px; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
-        .gate-sub { font-family: 'Noto Serif'; font-size: 14px; color: #aaa; margin-top: 5px; letter-spacing: 2px; text-transform: uppercase; }
-        .gate-hud { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 1px dashed rgba(255,255,255,0.3); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: all 0.5s; opacity: 0; z-index: 30; }
-        .gate-hud.active { opacity: 1; border: 4px solid #fff; width: 280px; height: 280px; background: rgba(255,255,255,0.05); box-shadow: 0 0 50px rgba(255,255,255,0.1); }
-        .gate-icon { font-size: 40px; margin-bottom: 10px; }
-        .gate-status { font-family: 'Syncopate'; font-size: 10px; letter-spacing: 2px; color: #fff; }
-        .gate-controls { display: flex; justify-content: space-between; align-items: flex-end; opacity: 0; transition: 1s; }
-        .gate-controls.visible { opacity: 1; }
-        .gate-guide { font-family: 'Syncopate'; font-size: 10px; color: #888; line-height: 1.6; text-align: left; }
-        .gate-monitor { display: flex; gap: 10px; pointer-events: auto; background: rgba(0,0,0,0.5); padding: 5px; border: 1px solid #333; }
-        .monitor-screen { width: 80px; height: 60px; background: #111; border: 1px solid #555; transform: scaleX(-1); }
-        .monitor-screen video, .monitor-screen canvas { width: 100%; height: 100%; object-fit: cover; }
-        .gate-start-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.8); z-index: 50; transition: opacity 0.5s; }
-        .gate-start-layer.hidden { opacity: 0; pointer-events: none; }
-        .btn-activate { padding: 20px 50px; border: 2px solid #ffae00; color: #fff; font-family: 'Orbitron'; font-size: 18px; letter-spacing: 4px; background: rgba(0,0,0,0.6); cursor: pointer; transition: 0.3s; box-shadow: 0 0 30px rgba(255, 174, 0, 0.2); pointer-events: auto; }
-        .btn-activate:hover { background: #ffae00; color: #000; box-shadow: 0 0 60px #ffae00; }
+        .void-terminal {
+            position: relative;
+            width: 85vw; max-width: 960px;
+            aspect-ratio: 16/9;
+            background: rgba(5, 5, 5, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 100px rgba(0,0,0,0.5);
+            z-index: 10;
+            overflow: hidden;
+            border-radius: 4px;
+        }
 
-        #outro-summary { position: relative; width: 100%; height: 100vh; background-color: #000000; display: flex; justify-content: center; align-items: center; z-index: 20; overflow: hidden; }
+        .void-terminal::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            opacity: 0.5; z-index: 5;
+        }
+        
+        .void-terminal::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+            z-index: 6;
+        }
+
+        .hud-corner {
+            position: absolute; width: 40px; height: 40px;
+            border-color: rgba(255, 255, 255, 0.4);
+            border-style: solid;
+            pointer-events: none; z-index: 20;
+            transition: all 0.5s ease;
+        }
+        .void-terminal:hover .hud-corner { border-color: #ffae00; width: 50px; height: 50px; }
+        
+        .tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+        .tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+        .bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+        .br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+
+        .hud-status {
+            position: absolute; top: 25px; left: 40px; z-index: 20;
+            font-family: 'Share Tech Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.6);
+            display: flex; flex-direction: column; gap: 4px; pointer-events: none;
+        }
+        .hud-rec { display: flex; align-items: center; gap: 6px; color: #ff3333; text-shadow: 0 0 5px #ff3333; }
+        .hud-dot { width: 6px; height: 6px; background: #ff3333; border-radius: 50%; animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .gw-header {
+            position: absolute; top: 20px; right: 20px; z-index: 50;
+            display: flex; gap: 10px;
+        }
+        
+        .gw-btn-icon {
+            width: 30px; height: 30px; 
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.8);
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            transition: all 0.2s; backdrop-filter: blur(4px);
+        }
+        .gw-btn-icon:hover { background: #fff; color: #000; border-color: #fff; }
+        .gw-btn-icon.danger:hover { background: #ff3333; color: #fff; border-color: #ff3333; }
+
+        #gw-canvas-trail { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        #gw-objects-container { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; overflow: hidden; pointer-events: none; }
+        
+        .gw-organism { 
+            position: absolute; width: 100px; height: 100px; 
+            top: 0; left: 0; will-change: transform; 
+            pointer-events: auto; transition: none;
+        }
+        .gw-organism-inner {
+            width: 100%; height: 100%;
+            transition: transform 0.3s ease;
+        }
+        .gw-organism-inner img { 
+            width: 100%; height: 100%; object-fit: contain; 
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)); 
+        }
+        .gw-organism:hover .gw-organism-inner { transform: scale(1.1); filter: drop-shadow(0 0 20px rgba(255, 174, 0, 0.4)); }
+        
+        .gw-dock-wrapper {
+            position: absolute; bottom: 30px; width: 100%;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            z-index: 50;
+        }
+        .gw-dock { display: flex; gap: 20px; }
+        
+        .gw-prism-btn {
+            position: relative; width: 44px; height: 44px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .gw-prism-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.2); border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .gw-icon-svg { width: 18px; height: 18px; stroke: rgba(255,255,255,0.7); fill: none; transition: stroke 0.3s; }
+        .gw-prism-btn:hover .gw-icon-svg { stroke: #fff; }
+
+        .gw-prism-btn.ink:hover { box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        .gw-prism-btn.hiphop:hover { box-shadow: 0 0 15px rgba(255, 69, 0, 0.6); border-color: #ff4500; }
+        .gw-prism-btn.hiphop:hover .gw-icon-svg { stroke: #ff4500; }
+        .gw-prism-btn.acid:hover { box-shadow: 0 0 15px rgba(0, 255, 204, 0.6); border-color: #00ffcc; }
+        .gw-prism-btn.acid:hover .gw-icon-svg { stroke: #00ffcc; }
+
+        .upload-text {
+            font-family: 'Syncopate'; font-size: 8px; color: rgba(255,255,255,0.4); 
+            letter-spacing: 3px; text-transform: uppercase; 
+            text-shadow: 0 0 10px rgba(255,255,255,0.1);
+            margin-top: 5px;
+        }
+
+        /* ========================================= */
+        /* --- SYNTH MODULE STYLES (BLACK GOLD REVISED) --- */
+        /* ========================================= */
+        #synth-section {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #020202; /* Pure Black Void */
+            color: #ffffff;
+            font-family: 'Syncopate', sans-serif;
+            display: flex; flex-direction: column;
+            border-top: 1px solid rgba(255, 174, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 174, 0, 0.2);
+            box-sizing: border-box; /* Fix for layout sizing */
+            
+            /* Scoped Vars: Black & Gold Theme */
+            --glass-surface: rgba(10, 10, 10, 0.25); /* More transparent */
+            --glass-border: rgba(255, 174, 0, 0.15);
+            --glass-highlight: rgba(255, 200, 100, 0.1);
+            --accent-gold: #ffae00;
+            --accent-orange: #ff4500;
+            --text-muted: rgba(255, 255, 255, 0.4);
+        }
+
+        /* 1. Background Blobs (Warm & Dark) */
+        .ethereal-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25; /* Subtle */
+            z-index: 0;
+            animation: breathe 15s infinite alternate ease-in-out;
+        }
+        .blob-gold {
+            width: 70vw; height: 70vw;
+            background: radial-gradient(circle, var(--accent-gold), transparent 70%);
+            top: -30%; left: -10%;
+        }
+        .blob-orange {
+            width: 60vw; height: 60vw;
+            background: radial-gradient(circle, var(--accent-orange), transparent 70%);
+            bottom: -20%; right: -10%;
+            animation-delay: -5s;
+        }
+        @keyframes breathe {
+            0% { transform: scale(1) translate(0,0); opacity: 0.2; }
+            100% { transform: scale(1.1) translate(20px, -20px); opacity: 0.35; }
+        }
+
+        /* 2. Noise Texture Overlay */
+        .ethereal-noise {
+            position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            opacity: 0.3; pointer-events: none; z-index: 1; mix-blend-mode: overlay;
+        }
+
+        /* 3. Layout Grid (UPDATED RATIOS FOR FIX) */
+        .synth-layout {
+            position: relative; z-index: 10;
+            display: grid;
+            /* Updated Column Ratio: Left 45%, Middle Auto, Right Fixed 240px */
+            grid-template-columns: 45% 1fr 240px;
+            grid-template-rows: 70px 1fr;
+            gap: 20px;
+            width: 100%; height: 100%;
+            padding: 30px 40px;
+            box-sizing: border-box;
+        }
+
+        /* Header Area */
+        .synth-top {
+            grid-column: 1 / -1;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+        .synth-brand h2 {
+            font-weight: 700; font-size: 20px; margin: 0; letter-spacing: 4px;
+            background: linear-gradient(to right, #fff, var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 174, 0, 0.3);
+        }
+        .synth-brand span { font-size: 9px; color: var(--text-muted); letter-spacing: 2px; }
+
+        /* Controls */
+        .synth-controls { display: flex; gap: 15px; }
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-gold);
+            font-family: 'Syncopate'; font-size: 9px; padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .glass-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-gold);
+            border-color: var(--accent-gold);
+        }
+        .glass-btn.active-play {
+            background: rgba(255, 174, 0, 0.1);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 15px rgba(255, 174, 0, 0.2);
+            color: #fff;
+        }
+
+        /* 4. Glass Panels (Translucent Obsidian) */
+        .glass-panel {
+            background: var(--glass-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-highlight);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex; flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: border-color 0.3s;
+            overflow: hidden; /* Prevent overflow */
+        }
+        .glass-panel:hover { border-color: rgba(255, 174, 0, 0.3); }
+
+        .panel-title {
+            font-size: 9px; color: var(--accent-gold); letter-spacing: 2px;
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;
+            opacity: 0.8; flex-shrink: 0;
+        }
+        .panel-title::after { content:''; width: 20px; height: 2px; background: var(--accent-gold); opacity: 0.5; }
+
+        /* Left: Visualizer Image */
+        .vis-container {
+            flex: 1; border-radius: 8px; overflow: hidden; position: relative;
+            background: #050505; border: 1px solid rgba(255,255,255,0.05);
+        }
+        #mainImage { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; filter: sepia(50%) hue-rotate(-10deg) contrast(1.1); transition: opacity 0.5s; }
+        .vis-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            padding: 25px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        }
+        .vis-text-lg { font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 5px; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
+        .vis-text-sm { font-size: 10px; color: var(--accent-gold); font-family: 'Share Tech Mono'; letter-spacing: 2px; text-transform: uppercase; }
+
+        /* Middle: Info & Scope */
+        .info-stack { display: flex; flex-direction: column; gap: 15px; height: 100%; overflow: hidden; }
+        .desc-box {
+            font-family: 'Noto Sans SC', sans-serif; font-size: 11px; line-height: 1.6; color: rgba(255,255,255,0.7);
+            flex: 1; overflow-y: auto; padding-right: 5px; border-left: 2px solid rgba(255,255,255,0.1); padding-left: 10px;
+            min-height: 0; /* Important for flex items to scroll */
+        }
+        .scope-box {
+            height: 140px; /* INCREASED HEIGHT */
+            background: rgba(0,0,0,0.4); border-radius: 4px;
+            border: 1px solid rgba(255, 174, 0, 0.1);
+            flex-shrink: 0;
+        }
+        
+        /* Right: Sequencer List */
+        .seq-list {
+            display: flex; flex-direction: column; gap: 6px;
+            overflow-y: auto; padding-right: 5px; height: 100%;
+        }
+        .seq-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .seq-item:hover { background: rgba(255, 174, 0, 0.05); border-color: rgba(255, 174, 0, 0.2); transform: translateX(-3px); }
+        .seq-item.selected {
+            background: linear-gradient(90deg, rgba(255, 174, 0, 0.1), transparent);
+            border-left: 2px solid var(--accent-gold);
+        }
+        .seq-name { font-size: 10px; color: #eee; letter-spacing: 1px; }
+        .seq-inst { font-size: 8px; color: var(--text-muted); font-family: 'Share Tech Mono'; }
+        
+        /* Toggle Switch */
+        .seq-toggle {
+            width: 24px; height: 12px; border-radius: 20px;
+            background: rgba(255,255,255,0.1); position: relative;
+            transition: 0.3s;
+        }
+        .seq-toggle::after {
+            content:''; position: absolute; top: 1px; left: 1px;
+            width: 10px; height: 10px; background: #666; border-radius: 50%;
+            transition: 0.3s;
+        }
+        .seq-item.active .seq-toggle { background: rgba(255, 174, 0, 0.2); }
+        .seq-item.active .seq-toggle::after { left: 13px; background: var(--accent-gold); box-shadow: 0 0 8px var(--accent-gold); }
+
+        /* Video Preview (Mini) - 16:9 RATIO */
+        .mini-video {
+            width: 100%; 
+            aspect-ratio: 16/9; /* FORCE 16:9 */
+            background: #000; border-radius: 6px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        #timbreVideo { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: opacity 0.3s; filter: grayscale(100%) sepia(80%) hue-rotate(-30deg); }
+        .mini-video:hover #timbreVideo { opacity: 1; filter: none; }
+
+        /* Play Bar */
+        .play-progress {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.05);
+        }
+        #play-head {
+            width: 0%; height: 100%; background: var(--accent-gold);
+            box-shadow: 0 0 15px var(--accent-gold);
+            transition: width 0.1s linear;
+        }
+
+        /* ========================================= */
+        /* --- END SYNTH STYLES --- */
+
+        /* ========================================= */
+        /* --- BLANK VOID SECTION (PLACEHOLDER) --- */
+        /* ========================================= */
+        #blank-void-section {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background-color: #000000;
+            z-index: 15; /* Sits between Synth (low z) and Outro (high z) */
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Optional placeholder text styling */
+        .void-placeholder-text {
+            font-family: 'Share Tech Mono', monospace;
+            color: #111;
+            font-size: 12px;
+            letter-spacing: 2px;
+            user-select: none;
+        }
+
+        #bg-canvas-synth {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; opacity: 0.6; pointer-events: none;
+        }
+
+        /* --- Synth Header --- */
+        .synth-header {
+            height: 60px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px;
+            border-bottom: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+        .synth-logo { 
+            font-weight: 200; letter-spacing: 6px; color: var(--ethereal-white); 
+            font-size: 16px; text-transform: uppercase;
+            text-shadow: 0 0 20px var(--glow-color);
+        }
+        .master-controls { display: flex; gap: 20px; align-items: center; }
+        
+        .btn-ethereal {
+            padding: 8px 24px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            color: var(--ethereal-cyan); font-size: 10px; letter-spacing: 2px;
+            cursor: pointer; transition: all 0.4s ease;
+            text-transform: uppercase;
+        }
+        .btn-ethereal:hover {
+            background: var(--glow-color);
+            border-color: var(--ethereal-cyan);
+            color: #fff;
+            box-shadow: 0 0 30px var(--glow-color);
+        }
+
+        /* --- Synth Main Layout --- */
+        .synth-main {
+            flex: 1; display: grid;
+            grid-template-columns: 1.3fr 1fr 0.9fr; 
+            gap: 20px;
+            padding: 20px 40px 30px 40px;
+            height: 100%; min-height: 0;
+            position: relative; z-index: 5;
+        }
+
+        /* --- Synth Panels --- */
+        .panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex; flex-direction: column;
+            position: relative;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            height: 100%; overflow: hidden;
+        }
+        .panel::before, .panel::after { content: ''; position: absolute; width: 15px; height: 15px; opacity: 0.5; }
+        .panel::before { top: -1px; left: -1px; border-top: 1px solid var(--ethereal-cyan); border-left: 1px solid var(--ethereal-cyan); border-radius: 12px 0 0 0; }
+        .panel::after { bottom: -1px; right: -1px; border-bottom: 1px solid var(--ethereal-cyan); border-right: 1px solid var(--ethereal-cyan); border-radius: 0 0 12px 0; }
+
+        .panel-header {
+            flex-shrink: 0; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .panel-label {
+            font-size: 9px; color: rgba(255,255,255,0.5); letter-spacing: 3px; text-transform: uppercase;
+        }
+        .panel-dots { display: flex; gap: 4px; }
+        .dot { width: 4px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 50%; }
+
+        /* --- Synth Left --- */
+        .image-display-container {
+            flex: 1; background: #000;
+            border-radius: 4px; overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+            min-height: 0;
+        }
+        #mainImage {
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.9; transition: opacity 0.5s ease;
+            filter: grayscale(20%) contrast(1.1);
+        }
+        .overlay-info {
+            position: absolute; bottom: 30px; left: 30px;
+            z-index: 2; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+        .move-title-glitch {
+            font-size: 42px; font-weight: 100; color: #fff; 
+            line-height: 1; margin-bottom: 8px; letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #a5f3fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .move-subtitle-tech { 
+            font-size: 11px; color: var(--ethereal-cyan); letter-spacing: 4px; 
+            text-transform: uppercase; border-left: 2px solid var(--ethereal-cyan); padding-left: 10px;
+        }
+
+        /* --- Synth Center --- */
+        .info-content { flex: 1; display: flex; flex-direction: column; gap: 15px; height: 100%; min-height: 0; }
+        .text-section { flex: 0 0 auto; }
+        .context-box {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px; line-height: 1.5; color: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.02); padding: 12px; border-radius: 4px;
+            border-left: 1px solid var(--ethereal-purple);
+            white-space: pre-wrap;
+        }
+        .video-section { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .timbre-video-wrapper {
+            flex: 1; width: 100%;
+            border-radius: 4px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative; background: #000;
+        }
+        #timbreVideo {
+            width: 100%; height: 100%; object-fit: cover;
+            opacity: 0.6; transition: all 0.3s ease;
+            filter: sepia(20%) hue-rotate(180deg) contrast(1.1);
+        }
+        .timbre-video-wrapper:hover #timbreVideo { opacity: 1; filter: none; }
+        .hover-hint {
+            position: absolute; bottom: 10px; right: 10px;
+            background: rgba(0,0,0,0.6); color: var(--ethereal-cyan);
+            font-size: 9px; padding: 4px 8px; border-radius: 4px;
+            border: 1px solid var(--ethereal-cyan); pointer-events: none;
+        }
+        .scope-section { flex: 0 0 100px; }
+        .visualizer-box {
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.2); border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* --- Synth Right --- */
+        .sequencer-grid {
+            flex: 1; display: flex; flex-direction: column; gap: 6px;
+            overflow-y: auto; padding-right: 5px; min-height: 0;
+        }
+        .track-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px; background: rgba(255,255,255,0.02);
+            border: 1px solid transparent; border-radius: 6px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .track-card:hover { background: rgba(255,255,255,0.05); transform: translateX(5px); }
+        .track-card.selected {
+            background: linear-gradient(90deg, rgba(165, 243, 252, 0.05), transparent);
+            border-left: 2px solid var(--ethereal-cyan);
+        }
+        .track-title { font-size: 12px; font-weight: 500; color: #fff; }
+        .track-type { font-size: 9px; color: var(--ethereal-purple); opacity: 0.7; }
+        .neon-switch {
+            width: 36px; height: 18px; background: rgba(0,0,0,0.5);
+            border-radius: 20px; position: relative;
+            border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
+        }
+        .neon-switch::after {
+            content:''; position: absolute; left: 2px; top: 2px;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: #555; transition: 0.3s;
+        }
+        .track-card.active .neon-switch { border-color: var(--ethereal-cyan); box-shadow: 0 0 8px var(--glow-color); }
+        .track-card.active .neon-switch::after { left: 20px; background: var(--ethereal-cyan); }
+
+        #play-bar-container {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+            background: #111; z-index: 100;
+        }
+        #play-head {
+            height: 100%; background: linear-gradient(90deg, var(--ethereal-purple), var(--ethereal-cyan));
+            width: 0%; box-shadow: 0 -2px 10px var(--ethereal-cyan);
+            transition: width 0.1s linear;
+        }
+
+        /* --- End Synth Module Styles --- */
+
+        #outro-summary { position: relative; width: 100%; height: 100vh; background-color: #000000; display: flex; justify-content: center; align-items: center; z-index: 20; overflow: hidden; border-top: 1px solid #333; }
         #outro-canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: auto; }
         
         #outro-text {
-            position: absolute;
-            top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 900px;
-            text-align: center;
-            font-family: 'Share Tech Mono', monospace; 
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.9); /* White text for dark background */
-            text-shadow: 0 0 10px rgba(255,255,255,0.5);
-            z-index: 100;
-            pointer-events: none; 
-            opacity: 0;
-            transition: opacity 1s;
+            position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 80%; max-width: 900px;
+            text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9); text-shadow: 0 0 10px rgba(255,255,255,0.5); z-index: 100;
+            pointer-events: none; opacity: 0; transition: opacity 1s;
         }
         #outro-text.visible { opacity: 1; }
 
         .nav-fixed { position: fixed; bottom: 30px; right: 40px; z-index: 100; mix-blend-mode: difference; }
         .nav-link { font-family: 'Syncopate'; font-size: 10px; color: #fff; cursor: pointer; }
-        #process-canvas { display: none; }
     </style>
 </head>
 <body>
@@ -196,18 +706,19 @@
         <div class="tree-header">
             <h1 class="neon-title">ROOTED<br><span style="font-size:0.5em; color:#fff; -webkit-text-stroke:0;">/</span><br>LEVITATING</h1>
             <div class="header-monologue">
-                Departing from the roots of Wing Chun,<br>
-                pulsing with the rhythms of Hip-Hop,<br>
-                merging into the Pisces reverie.<br><br>
-                I once peered at the stage through a screen;<br>
-                now stepping out of physical confines,<br>
-                I explore the forms of unbound dance.
+                <p>Departing from the roots of Wing Chun, pulsing with the rhythms of Hip-Hop, merging into the Pisces reverie.</p>
+                <p>I once peered at the stage through a screen; now stepping out of physical confines, I explore the forms of unbound dance.</p>
             </div>
         </div>
 
         <div class="content-stream">
             <div class="intro-wide-block" id="intro-anchor">
                 <div class="intro-img-box"><img src="images/image_e25b31.jpg" alt="Intro"></div>
+            </div>
+
+            <div class="section-divider">
+                <div class="mini-door"></div>
+                <h3 class="divider-text">ENTER MY CHILDHOOD: THE GOLDEN ERA 99-09</h3>
             </div>
 
             <section class="vine-section">
@@ -217,7 +728,13 @@
                 </svg>
                 
                 <div class="node-block" id="node-1">
-                    <div class="node-meta"><span class="meta-id">01</span><span class="meta-sub">Wing Chun</span><h2 class="meta-title">The Square Inch</h2><div class="meta-desc"><p>The body is the first vessel. Amidst the percussion of the wooden dummy and the shadows of old blocks, I established my own coordinate system.</p></div></div>
+                    <div class="node-meta">
+                        <h2 class="meta-title-bilingual">东方美学的国际化盛宴<small>The Global Feast of Eastern Aesthetics</small></h2>
+                        <div class="meta-desc-bilingual">
+                            <p>1999-2009年是中国武侠的国际化巅峰。以《卧虎藏龙》斩获奥斯卡为起点，武侠从港式江湖转向张艺谋《英雄》式的宏大美学与哲学思考。这十年见证了从写意剑戟到甄子丹《叶问》实战功夫的多元演变，让东方武学美学震撼全球。</p>
+                            <span class="en-text">The years 1999-2009 marked the global pinnacle of Chinese Wuxia. Starting with Crouching Tiger, Hidden Dragon's Oscar win, the genre shifted from Hong Kong-style underworld tales to the grand visual aesthetics and philosophical depth of Zhang Yimou's Hero. This decade witnessed a diverse evolution from poetic swordplay to the grounded combat of Ip Man, introducing Eastern martial arts aesthetics to the world.</span>
+                        </div>
+                    </div>
                     <div class="node-visual">
                         <div class="cyber-screen" data-screen="1">
                             <div class="screen-overlay"></div>
@@ -230,6 +747,13 @@
                 </div>
 
                 <div class="node-block" id="node-2">
+                    <div class="node-meta">
+                        <h2 class="meta-title-bilingual">街头梦想与MTV一代<small>Street Dreams & The MTV Generation</small></h2>
+                        <div class="meta-desc-bilingual">
+                            <p>这十年的嘻哈电影少了一份火药味，多了一份“星梦缘”。那是嘻哈全面接管流行文化的时期，电影主打“街头VS学院”的冲突美学。不仅是说唱，街舞（Breaking/Hip-Hop Dance）成为了年轻人表达自我的通用语言。那个时代的氛围是充满活力的、汗水淋漓的，每个人都相信只要在Battle中赢了，人生就能翻盘。</p>
+                            <span class="en-text">This decade saw Hip-Hop movies shift from gritty crime tales to "stardom dreams." It was the era when Hip-Hop fully took over pop culture, and films focused on the aesthetic clash of "Street vs. Academy." Beyond just rap, street dance became the universal language of youth self-expression. The vibe was energetic and sweat-soaked, driven by the belief that winning a battle could change your life.</span>
+                        </div>
+                    </div>
                     <div class="node-visual">
                         <div class="cyber-screen" data-screen="2">
                             <div class="screen-overlay"></div>
@@ -238,11 +762,16 @@
                             <div class="slide" style="background-image: url('images/poster_hh_3.jpg')"></div>
                         </div>
                     </div>
-                    <div class="node-meta"><span class="meta-id">02</span><span class="meta-sub">Flow</span><h2 class="meta-title">West Coast Rhythm</h2><div class="meta-desc"><p>The moment rules were broken. California sunshine pierced through the static of black and white TV, rhythm becoming a new language.</p></div></div>
                 </div>
 
                 <div class="node-block" id="node-3">
-                    <div class="node-meta"><span class="meta-id">03</span><span class="meta-sub">Void</span><h2 class="meta-title">Wandering the Void</h2><div class="meta-desc"><p>The dissolution of gravity. In the low frequencies of Trip-hop and psychedelic neon, I built a levitating inner stage.</p></div></div>
+                    <div class="node-meta">
+                        <h2 class="meta-title-bilingual">世纪末的霓虹梦呓<small>Neon Daydreams at the Turn of the Century</small></h2>
+                        <div class="meta-desc-bilingual">
+                            <p>伴随千禧年的迷茫与科技躁动，神游舞曲（Trip-Hop）的迷幻节拍渗透进王家卫与侯孝贤的影像。从王菲《Di-Dar》的先锋实验到《千禧曼波》的霓虹疏离，这种文化捕捉了都市男女在世纪末的虚无与梦呓，构筑了独有的迷离美学。</p>
+                            <span class="en-text">Amidst Y2K anxiety and technological restlessness, the psychedelic beats of Trip-Hop permeated the cinema of Wong Kar-wai and Hou Hsiao-hsien. From the avant-garde experiments of Faye Wong’s Di-Dar to the neon-lit alienation of Millennium Mambo, this culture captured the nihilism and dreamlike state of urban youth at the turn of the century, constructing a unique aesthetic of disorientation.</span>
+                        </div>
+                    </div>
                     <div class="node-visual">
                         <div class="cyber-screen" data-screen="3">
                             <div class="screen-overlay"></div>
@@ -254,9 +783,74 @@
                 </div>
             </section>
 
-            <div class="transition-title-block">
-                <div style="width:2px; height:100px; background:#ffae00; margin:0 auto 20px auto;"></div>
-                <h2 class="trans-title">INFINITE STAGE</h2>
+            <div class="section-divider">
+                <div class="mini-door"></div>
+                <h3 class="divider-text">WHAT WILL I BECOME?</h3>
+            </div>
+
+             <!-- NEW GRAFFITI WALL SECTION -->
+            <section id="graffiti-wall-section">
+                
+                <!-- The Void Terminal -->
+                <div class="void-terminal">
+                    
+                    <!-- HUD Elements (Viewfinder) -->
+                    <div class="hud-corner tl"></div>
+                    <div class="hud-corner tr"></div>
+                    <div class="hud-corner bl"></div>
+                    <div class="hud-corner br"></div>
+                    
+                    <div class="hud-status">
+                        <div class="hud-rec"><div class="hud-dot"></div> MEMORY_STREAM</div>
+                        <div>ISO 800 // F2.8</div>
+                    </div>
+
+                    <!-- Header Controls (Floating) -->
+                    <div class="gw-header">
+                        <div class="gw-btn-icon" onclick="graffitiApp.togglePlay()" title="Play/Pause">
+                            <svg id="gw-play-icon" class="gw-icon-svg" viewBox="0 0 24 24" style="stroke:currentColor;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                        </div>
+                        <div class="gw-btn-icon" onclick="graffitiApp.saveArt()" title="Save Art">
+                            <svg class="gw-icon-svg" viewBox="0 0 24 24" style="stroke:currentColor;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </div>
+                        <div class="gw-btn-icon danger" onclick="graffitiApp.clearTank()" title="Clear">
+                            <svg class="gw-icon-svg" viewBox="0 0 24 24" style="stroke:currentColor;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Layers -->
+                    <canvas id="gw-canvas-trail"></canvas>
+                    <div id="gw-objects-container"></div>
+                    
+                    <!-- Bottom Inputs Overlay -->
+                    <div class="gw-dock-wrapper">
+                        <div class="gw-dock">
+                            <!-- INK -->
+                            <div class="gw-prism-btn ink" onclick="document.getElementById('gw-ink-input').click()" title="INK MODE">
+                                <svg class="gw-icon-svg" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+                                <input type="file" id="gw-ink-input" hidden accept="image/*" onchange="graffitiApp.handleUpload(event, 'ink')">
+                            </div>
+                            <!-- HIPHOP -->
+                            <div class="gw-prism-btn hiphop" onclick="document.getElementById('gw-hiphop-input').click()" title="POP MODE">
+                                <svg class="gw-icon-svg" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                <input type="file" id="gw-hiphop-input" hidden accept="image/*" onchange="graffitiApp.handleUpload(event, 'hiphop')">
+                            </div>
+                            <!-- ACID -->
+                            <div class="gw-prism-btn acid" onclick="document.getElementById('gw-acid-input').click()" title="ACID MODE">
+                                <svg class="gw-icon-svg" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                <input type="file" id="gw-acid-input" hidden accept="image/*" onchange="graffitiApp.handleUpload(event, 'acid')">
+                            </div>
+                        </div>
+                        <div class="upload-text">Upload Your Memory</div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- NEW DIVIDER: TRANSITION TO STAGE -->
+            <div class="section-divider">
+                <div class="mini-door"></div>
+                <h3 class="divider-text">PLEASE STEP ON STAGE</h3>
             </div>
         </div>
 
@@ -271,82 +865,74 @@
             </div>
         </section>
 
-        <section id="synthesis-lab">
-            <div class="lab-connector"></div>
-            <div class="lab-title-box">
-                <span class="lab-sub">DECONSTRUCTING MOVEMENT</span>
-                <h2 class="lab-main-title">ELEMENT SYNTHESIS</h2>
-                <span class="lab-sub">SELECT PARAMETERS TO RECONSTRUCT</span>
-            </div>
+        <section id="synth-section">
+            <!-- 1. Background System -->
+            <div class="ethereal-blob blob-gold"></div>
+            <div class="ethereal-blob blob-orange"></div>
+            <div class="ethereal-noise"></div>
+            <div class="play-progress"><div id="play-head"></div></div>
 
-            <div class="lab-grid">
-                <div class="lab-card" onmouseenter="startAudioPreview()" onmouseleave="stopAudioPreview()">
-                    <div class="visual-layer"><canvas id="viz-audio" class="viz-canvas"></canvas></div>
-                    <div class="card-content">
-                        <div class="card-head"><span>SEQUENCER</span><span class="card-icon">🔊</span></div>
-                        <div class="card-options">
-                            <div class="opt-item" onmouseover="setAudioMode('zen')">ZEN MODE<span>BINAURAL BEATS</span></div>
-                            <div class="opt-item" onmouseover="setAudioMode('hiphop')">BOOM BAP<span>KICK SNARE HAT</span></div>
-                            <div class="opt-item" onmouseover="setAudioMode('triphop')">AMBIENT<span>DETUNED SAW</span></div>
+            <!-- 2. Main Grid Layout -->
+            <div class="synth-layout">
+                
+                <!-- Top Bar -->
+                <div class="synth-top">
+                    <div class="synth-brand">
+                        <h2>SYNTHESIS</h2>
+                        <span>MOTION TO SOUND INTERFACE</span>
+                    </div>
+                    <div class="synth-controls">
+                        <button class="glass-btn" onclick="synthApp.toggleAll(true)">UNMUTE ALL</button>
+                        <button class="glass-btn" id="playBtn" onclick="synthApp.togglePlay()">INITIALIZE</button>
+                    </div>
+                </div>
+
+                <!-- Left Panel: Visualizer (Expanded) -->
+                <div class="glass-panel" style="grid-row: 2 / 3;">
+                    <div class="panel-title">VISUAL FEED</div>
+                    <div class="vis-container">
+                        <img id="mainImage" src="" alt="Move">
+                        <div class="vis-overlay">
+                            <div class="vis-text-lg" id="displayTitle">TAN SAO</div>
+                            <div class="vis-text-sm" id="displaySubtitle">AMBIENT PAD</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="lab-card" onmouseenter="startSceneViz()" onmouseleave="stopSceneViz()">
-                    <div class="visual-layer"><canvas id="viz-scene" class="viz-canvas"></canvas></div>
-                    <div class="card-content">
-                        <div class="card-head"><span>ATMOSPHERE</span><span class="card-icon">👁️</span></div>
-                        <div class="card-options">
-                            <div class="opt-item" onmouseover="setSceneMode('void')">VOID<span>MINIMALIST</span></div>
-                            <div class="opt-item" onmouseover="setSceneMode('concrete')">CONCRETE<span>URBAN GRID</span></div>
-                            <div class="opt-item" onmouseover="setSceneMode('fluid')">FLUID<span>CYBERNETIC</span></div>
+                <!-- Center Panel: Data & Scope (Compressed) -->
+                <div class="glass-panel" style="grid-row: 2 / 3;">
+                    <div class="panel-title">DATA STREAM</div>
+                    <div class="info-stack">
+                        <div class="desc-box" id="displayText">
+                            System Standby...
+                        </div>
+                        
+                        <div class="mini-video">
+                            <video id="timbreVideo" loop muted playsinline></video>
+                            <div style="position:absolute; bottom:5px; right:5px; font-size:8px; color:rgba(255,174,0,0.8); font-family:'Share Tech Mono'">HOVER TO LISTEN</div>
+                        </div>
+
+                        <div>
+                            <div class="panel-title" style="margin-bottom:8px; font-size:8px;">OSCILLOSCOPE</div>
+                            <canvas id="scopeCanvas" class="scope-box" width="300" height="140"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <div class="lab-card" onmouseenter="startAvatar()" onmouseleave="stopAvatar()">
-                    <div class="visual-layer"><div id="avatar-3d-container"></div></div>
-                    <div class="card-content">
-                        <div class="card-head"><span>MOTION DATA</span><span class="card-icon">👤</span></div>
-                        <div class="card-options">
-                            <div class="opt-item" onmouseover="setAvatarMode('wingchun')">THE MONK<span>TAN SAO / FOOK SAO</span></div>
-                            <div class="opt-item" onmouseover="setAvatarMode('hiphop')">THE BREAKER<span>BOUNCE / GROOVE</span></div>
-                            <div class="opt-item" onmouseover="setAvatarMode('triphop')">THE GHOST<span>FLOAT / TWIST</span></div>
-                        </div>
+                <!-- Right Panel: Sequencer -->
+                <div class="glass-panel" style="grid-row: 2 / 3;">
+                    <div class="panel-title">SEQUENCE LAYER</div>
+                    <div class="seq-list" id="trackList">
+                        <!-- JS Generated Items -->
                     </div>
                 </div>
+
             </div>
         </section>
 
-        <section class="chronos-section">
-            <div class="chronos-connector"></div>
-            <div class="gate-start-layer">
-                <button class="btn-activate" onclick="initChronosGate()">ACTIVATE CHRONOS GATE</button>
-            </div>
-            
-            <div class="gate-overlay">
-                <div class="gate-header">
-                    <div class="gate-title" id="gate-ui-title">CHRONOS HUB</div>
-                    <div class="gate-sub" id="gate-ui-sub">Connection · Past & Future</div>
-                </div>
-                
-                <div class="gate-hud" id="gate-hud">
-                    <div class="gate-icon" id="gate-ui-icon">⛩️</div>
-                    <div class="gate-status" id="gate-ui-status">STANDBY</div>
-                </div>
-                <div class="gate-controls">
-                    <div class="gate-guide">
-                        👊 <b>CENTER:</b> HIP-HOP (BURST)<br>
-                        🌊 <b>SIDES:</b> TRIP-HOP (FLOW)<br>
-                        🧘 <b>STILL:</b> ZEN (RESET)
-                    </div>
-                    <div class="gate-monitor">
-                        <div class="monitor-screen"><video id="webcam-preview" autoplay muted playsinline></video></div>
-                        <div class="monitor-screen"><canvas id="motion-debug"></canvas></div>
-                    </div>
-                </div>
-            </div>
-            <div id="chronos-container"></div>
+        <!-- NEW BLANK PAGE FOR FUTURE CONTENT -->
+        <section id="blank-void-section">
+            <div class="void-placeholder-text">[ VOID SPACE RESERVED ]</div>
         </section>
 
         <section id="outro-summary">
@@ -356,50 +942,11 @@
         
         <div class="nav-fixed"><div class="nav-link" onclick="location.reload()">RESTART</div></div>
         
-        <div class="credits-fixed">WEBPAGE GENERATED BY GEMINI · MUSIC BY SUNO</div>
+        <div class="credits-fixed">WEBPAGE GENERATED WITH GEMINI</div>
     </div>
 
-    <canvas id="process-canvas"></canvas>
-
-    <script type="x-shader/x-vertex" id="vs-zen">
-        uniform float time; attribute float size; varying float vOpacity;
-        void main() { vec3 pos = position; pos.y -= time * 5.0; pos.x += sin(time * 0.5 + pos.z * 0.05) * 5.0; if (pos.y < -100.0) pos.y += 200.0; vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0); gl_PointSize = size * (300.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; vOpacity = smoothstep(150.0, 0.0, -mvPosition.z); }
-    </script>
-    <script type="x-shader/x-fragment" id="fs-zen">
-        uniform vec3 color; varying float vOpacity; void main() { float d = distance(gl_PointCoord, vec2(0.5)); if(d > 0.5) discard; gl_FragColor = vec4(color, vOpacity * 0.5); }
-    </script>
-    <script type="x-shader/x-vertex" id="vs-hiphop">
-        uniform float time; uniform float uEnergy; attribute vec3 offset; attribute vec3 colorAttr; varying vec3 vColor;
-        void main() { vec3 pos = offset; pos += sin(pos * 10.0 + time * 20.0) * uEnergy * 5.0; float angle = time + length(pos.xy)*0.05; float c = cos(angle); float s = sin(angle); pos.xy = mat2(c, -s, s, c) * pos.xy; vColor = colorAttr; gl_Position = projectionMatrix * modelViewMatrix * vec4(position + pos, 1.0); }
-    </script>
-    <script type="x-shader/x-fragment" id="fs-hiphop">
-        varying vec3 vColor; void main() { gl_FragColor = vec4(vColor, 0.8); }
-    </script>
-    <script type="x-shader/x-vertex" id="vs-triphop">
-        uniform float time; uniform float uFlow; varying vec2 vUv; void main() { vUv = uv; vec3 pos = position; float wave = sin(uv.x * 10.0 + time) * cos(uv.y * 10.0 + time); pos.z += wave * (5.0 + uFlow * 20.0); gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0); }
-    </script>
-    <script type="x-shader/x-fragment" id="fs-triphop">
-        uniform float time; varying vec2 vUv; void main() { vec3 c1 = vec3(0.2, 0.0, 0.4); vec3 c2 = vec3(0.0, 0.8, 0.8); float p = sin(vUv.x * 20.0 + time) * sin(vUv.y * 20.0 - time); gl_FragColor = vec4(mix(c1, c2, p * 0.5 + 0.5), 0.6); }
-    </script>
-
-    <script type="x-shader/x-vertex" id="vs-sky">
-        varying vec3 vWorldPosition;
-        void main() {
-            vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-            vWorldPosition = worldPosition.xyz;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-        }
-    </script>
-    <script type="x-shader/x-fragment" id="fs-sky">
-        uniform vec3 topColor; uniform vec3 bottomColor; uniform float offset; uniform float exponent; varying vec3 vWorldPosition;
-        void main() {
-            float h = normalize( vWorldPosition + offset ).y;
-            gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
-        }
-    </script>
-
     <script>
-        // --- 0. NEW: Audio Manager ---
+        // --- 0. Audio Manager (Main Page) ---
         let bgmPlaying = false;
         function toggleAudio() {
             const bgm = document.getElementById('bgm');
@@ -416,7 +963,7 @@
             }
         }
 
-        // --- 1. NEW: Digital Wisp (Mouse Follower) ---
+        // --- 1. Digital Wisp (Mouse Follower) ---
         function initWisp() {
             const canvas = document.getElementById('wisp-canvas');
             const ctx = canvas.getContext('2d');
@@ -482,7 +1029,6 @@
             
             // Try to play BGM on start
             const bgm = document.getElementById('bgm');
-            // --- VOLUME ADJUSTMENT: LOWERED BGM ---
             bgm.volume = 0.2; 
             
             bgm.play().then(() => {
@@ -498,6 +1044,7 @@
                 updateVine();
                 initSlideshows(); 
                 initWisp(); // Start the wisp
+                graffitiApp.init(); // Init new graffiti wall
             }, 100);
         }
 
@@ -517,15 +1064,15 @@
         }
 
         // --- Background Soul Tree ---
-        const canvas = document.getElementById('soul-tree-canvas'); const ctx = canvas.getContext('2d');
-        let w, h; const tentacles = []; const numTentacles = 100; const spiritParticles = []; 
-        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; initTentacles(); updateVine(); }
-        window.addEventListener('resize', resize);
-        class Tentacle { constructor() { this.reset(); } reset() { this.x = w / 2 + (Math.random() - 0.5) * w * 0.6; this.y = h + Math.random() * 100; this.segments = []; this.numSegments = 60; this.segHeight = (h + 250) / this.numSegments; this.angleOffset = Math.random() * Math.PI * 2; this.waveSpeed = Math.random() * 0.015 + 0.005; this.colorBase = Math.random() > 0.5 ? '255, 174, 0' : '255, 69, 0'; this.thickness = Math.random() * 1.8 + 0.3; for(let i=0; i<this.numSegments; i++) { this.segments.push({ x: this.x, y: this.y - i * this.segHeight }); } } update(time) { for(let i=0; i<this.numSegments; i++) { const sway = Math.sin(time * this.waveSpeed + i * 0.08 + this.angleOffset) * (i * 0.6); this.segments[i].x = this.x + sway + (this.x - w/2) * (i/this.numSegments) * 0.8; } } draw() { ctx.beginPath(); ctx.moveTo(this.segments[0].x, this.segments[0].y); for(let i=1; i<this.numSegments - 1; i++) { const xc = (this.segments[i].x + this.segments[i+1].x) / 2; const yc = (this.segments[i].y + this.segments[i+1].y) / 2; ctx.quadraticCurveTo(this.segments[i].x, this.segments[i].y, xc, yc); } const gradient = ctx.createLinearGradient(this.x, h, this.x, 0); gradient.addColorStop(0, `rgba(${this.colorBase}, 0)`); gradient.addColorStop(0.3, `rgba(${this.colorBase}, 0.5)`); gradient.addColorStop(1, `rgba(${this.colorBase}, 0)`); ctx.strokeStyle = gradient; ctx.lineWidth = this.thickness; ctx.stroke(); } }
-        class Spirit { constructor() { this.reset(); } reset() { this.x = Math.random() * w; this.y = h + Math.random() * 100; this.vy = Math.random() * 0.8 + 0.2; this.size = Math.random() * 1.5; this.alpha = Math.random(); } update() { this.y -= this.vy; if(this.y < 0) this.reset(); } draw() { ctx.fillStyle = `rgba(255, 200, 100, ${this.alpha * 0.4})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); } }
+        const soulCanvas = document.getElementById('soul-tree-canvas'); const soulCtx = soulCanvas.getContext('2d');
+        let soulW, soulH; const tentacles = []; const numTentacles = 100; const spiritParticles = []; 
+        function resizeTree() { soulW = soulCanvas.width = window.innerWidth; soulH = soulCanvas.height = window.innerHeight; initTentacles(); updateVine(); }
+        window.addEventListener('resize', resizeTree);
+        class Tentacle { constructor() { this.reset(); } reset() { this.x = soulW / 2 + (Math.random() - 0.5) * soulW * 0.6; this.y = soulH + Math.random() * 100; this.segments = []; this.numSegments = 60; this.segHeight = (soulH + 250) / this.numSegments; this.angleOffset = Math.random() * Math.PI * 2; this.waveSpeed = Math.random() * 0.015 + 0.005; this.colorBase = Math.random() > 0.5 ? '255, 174, 0' : '255, 69, 0'; this.thickness = Math.random() * 1.8 + 0.3; for(let i=0; i<this.numSegments; i++) { this.segments.push({ x: this.x, y: this.y - i * this.segHeight }); } } update(time) { for(let i=0; i<this.numSegments; i++) { const sway = Math.sin(time * this.waveSpeed + i * 0.08 + this.angleOffset) * (i * 0.6); this.segments[i].x = this.x + sway + (this.x - soulW/2) * (i/this.numSegments) * 0.8; } } draw() { soulCtx.beginPath(); soulCtx.moveTo(this.segments[0].x, this.segments[0].y); for(let i=1; i<this.numSegments - 1; i++) { const xc = (this.segments[i].x + this.segments[i+1].x) / 2; const yc = (this.segments[i].y + this.segments[i+1].y) / 2; soulCtx.quadraticCurveTo(this.segments[i].x, this.segments[i].y, xc, yc); } const gradient = soulCtx.createLinearGradient(this.x, soulH, this.x, 0); gradient.addColorStop(0, `rgba(${this.colorBase}, 0)`); gradient.addColorStop(0.3, `rgba(${this.colorBase}, 0.5)`); gradient.addColorStop(1, `rgba(${this.colorBase}, 0)`); soulCtx.strokeStyle = gradient; soulCtx.lineWidth = this.thickness; soulCtx.stroke(); } }
+        class Spirit { constructor() { this.reset(); } reset() { this.x = Math.random() * soulW; this.y = soulH + Math.random() * 100; this.vy = Math.random() * 0.8 + 0.2; this.size = Math.random() * 1.5; this.alpha = Math.random(); } update() { this.y -= this.vy; if(this.y < 0) this.reset(); } draw() { soulCtx.fillStyle = `rgba(255, 200, 100, ${this.alpha * 0.4})`; soulCtx.beginPath(); soulCtx.arc(this.x, this.y, this.size, 0, Math.PI*2); soulCtx.fill(); } }
         function initTentacles() { tentacles.length = 0; spiritParticles.length = 0; for(let i=0; i<numTentacles; i++) tentacles.push(new Tentacle()); for(let i=0; i<60; i++) spiritParticles.push(new Spirit()); }
-        let globalTime = 0; function animateTree() { ctx.fillStyle = 'rgba(10, 5, 0, 0.1)'; ctx.fillRect(0, 0, w, h); ctx.globalCompositeOperation = 'lighter'; globalTime += 1; tentacles.forEach(t => { t.update(globalTime); t.draw(); }); spiritParticles.forEach(s => { s.update(); s.draw(); }); ctx.globalCompositeOperation = 'source-over'; requestAnimationFrame(animateTree); }
-        resize(); animateTree();
+        let globalTime = 0; function animateTree() { soulCtx.fillStyle = 'rgba(10, 5, 0, 0.1)'; soulCtx.fillRect(0, 0, soulW, soulH); soulCtx.globalCompositeOperation = 'lighter'; globalTime += 1; tentacles.forEach(t => { t.update(globalTime); t.draw(); }); spiritParticles.forEach(s => { s.update(); s.draw(); }); soulCtx.globalCompositeOperation = 'source-over'; requestAnimationFrame(animateTree); }
+        resizeTree(); animateTree();
 
         // --- 2. Vine Navigation ---
         function updateVine() {
@@ -542,12 +1089,302 @@
                 vm.style.strokeDashoffset = len - len * Math.min(pct * 2, 1);
             });
         }
-        const observer = new IntersectionObserver((e)=>{e.forEach(i=>{if(i.isIntersecting)i.target.classList.add('is-visible')})}, {threshold:0.3});
-        document.querySelectorAll('.node-block, .transition-title-block').forEach(b=>observer.observe(b));
+        const observer = new IntersectionObserver((e)=>{e.forEach(i=>{
+            if(i.isIntersecting) {
+                i.target.classList.add('is-visible');
+            }
+        })}, {threshold:0.3});
+        document.querySelectorAll('.node-block, .section-divider').forEach(b=>observer.observe(b));
+
+        // ==========================================
+        // --- GRAFFITI WALL LOGIC (NEW) ---
+        // ==========================================
+        const graffitiApp = {
+            images: [],
+            isRunning: true,
+            canvas: null,
+            ctx: null,
+            container: null,
+            time: 0,
+            frameId: null,
+            observer: null,
+
+            init: () => {
+                graffitiApp.canvas = document.getElementById('gw-canvas-trail');
+                graffitiApp.ctx = graffitiApp.canvas.getContext('2d');
+                graffitiApp.container = document.getElementById('gw-objects-container');
+                
+                // Set preset images (Ensure these files exist in images/graffiti_presets/)
+                const initialData = [
+                    // Original 3
+                    { id: 'gw-init-1', type: 'ink', src: 'images/graffiti_presets/preset_ink.png', x: 150, y: 150 },
+                    { id: 'gw-init-2', type: 'hiphop', src: 'images/graffiti_presets/preset_hiphop.png', x: 400, y: 300 },
+                    { id: 'gw-init-3', type: 'acid', src: 'images/graffiti_presets/preset_acid.png', x: 600, y: 200 },
+                    // New 3 (Added as requested)
+                    { id: 'gw-init-4', type: 'ink', src: 'images/graffiti_presets/preset_ink_2.png', x: 250, y: 450 },
+                    { id: 'gw-init-5', type: 'hiphop', src: 'images/graffiti_presets/preset_hiphop_2.png', x: 550, y: 100 },
+                    { id: 'gw-init-6', type: 'acid', src: 'images/graffiti_presets/preset_acid_2.png', x: 750, y: 350 }
+                ];
+
+                // Fallback if local images missing, use placeholders for functionality demonstration
+                initialData.forEach(d => {
+                    const img = new Image();
+                    img.src = d.src;
+                    img.onerror = () => { 
+                         // Fallback to Unsplash if local file is missing
+                         if(d.type === 'ink') d.src = 'https://images.unsplash.com/photo-1517486430290-35657afd05cb?w=400&q=80';
+                         if(d.type === 'hiphop') d.src = 'https://images.unsplash.com/photo-1549887534-1541e9326642?w=400&q=80';
+                         if(d.type === 'acid') d.src = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=400&q=80';
+                         graffitiApp.updateDOM(d); // Refresh DOM
+                    };
+                });
+
+                graffitiApp.images = initialData.map(d => ({
+                    ...d,
+                    vx: (Math.random() - 0.5) * 1.0, 
+                    vy: (Math.random() - 0.5) * 1.0,
+                    rotation: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 0.3,
+                    buoyancyOffset: Math.random() * 100
+                }));
+
+                graffitiApp.images.forEach(img => graffitiApp.createDOM(img));
+                
+                // Resize handling
+                const resize = () => {
+                    const rect = graffitiApp.container.parentElement.getBoundingClientRect();
+                    graffitiApp.canvas.width = rect.width;
+                    graffitiApp.canvas.height = rect.height;
+                };
+                window.addEventListener('resize', resize);
+                resize();
+
+                // Visibility observer to pause/resume loop
+                const section = document.getElementById('graffiti-wall-section');
+                graffitiApp.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            if (!graffitiApp.frameId && graffitiApp.isRunning) graffitiApp.loop();
+                        } else {
+                            if (graffitiApp.frameId) {
+                                cancelAnimationFrame(graffitiApp.frameId);
+                                graffitiApp.frameId = null;
+                            }
+                        }
+                    });
+                });
+                graffitiApp.observer.observe(section);
+
+                graffitiApp.loop();
+            },
+
+            createDOM: (obj) => {
+                const div = document.createElement('div');
+                div.id = `organism-${obj.id}`;
+                div.className = 'gw-organism';
+                const divInner = document.createElement('div');
+                divInner.className = 'gw-organism-inner';
+                const img = document.createElement('img');
+                img.src = obj.src;
+                img.draggable = false;
+                divInner.appendChild(img);
+                div.appendChild(divInner);
+                graffitiApp.container.appendChild(div);
+            },
+            
+            updateDOM: (obj) => {
+                // If fallback changes src, update image tag
+                const el = document.getElementById(`organism-${obj.id}`);
+                if(el) el.querySelector('img').src = obj.src;
+            },
+
+            handleUpload: (e, type) => {
+                const files = Array.from(e.target.files);
+                if (!files.length) return;
+                const rect = graffitiApp.container.getBoundingClientRect();
+
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const id = 'gw-' + Date.now() + Math.random();
+                        const newObj = {
+                            id, type,
+                            src: ev.target.result,
+                            x: rect.width / 2,
+                            y: rect.height / 2,
+                            vx: (Math.random() - 0.5) * 1.5,
+                            vy: (Math.random() - 0.5) * 1.5,
+                            rotation: Math.random() * 360,
+                            rotSpeed: (Math.random() - 0.5) * 0.3,
+                            buoyancyOffset: Math.random() * 100
+                        };
+                        graffitiApp.images.push(newObj);
+                        graffitiApp.createDOM(newObj);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                e.target.value = '';
+            },
+
+            loop: () => {
+                if (!graffitiApp.isRunning) {
+                    graffitiApp.frameId = requestAnimationFrame(graffitiApp.loop);
+                    return;
+                }
+
+                const rect = graffitiApp.canvas.getBoundingClientRect();
+                const width = rect.width;
+                const height = rect.height;
+                graffitiApp.time += 0.008;
+
+                graffitiApp.images.forEach(obj => {
+                    const prevX = obj.x;
+                    const prevY = obj.y;
+
+                    // Physics
+                    obj.x += obj.vx;
+                    obj.y += obj.vy;
+                    
+                    // Buoyancy
+                    const floatY = Math.sin(graffitiApp.time + obj.buoyancyOffset) * 0.3 + 
+                                   Math.cos(graffitiApp.time * 0.5 + obj.buoyancyOffset) * 0.1;
+                    obj.y += floatY;
+                    
+                    obj.rotation += obj.rotSpeed;
+
+                    // Boundaries
+                    const padding = 50;
+                    if (obj.x <= padding || obj.x >= width - padding) {
+                        obj.vx *= -1;
+                        obj.x = obj.x <= padding ? padding + 1 : width - padding - 1;
+                        obj.rotSpeed += (Math.random() - 0.5) * 0.1;
+                    }
+                    if (obj.y <= padding || obj.y >= height - padding) {
+                        obj.vy *= -1;
+                        obj.y = obj.y <= padding ? padding + 1 : height - padding - 1;
+                        obj.rotSpeed += (Math.random() - 0.5) * 0.1;
+                    }
+                    obj.rotSpeed = Math.max(Math.min(obj.rotSpeed, 0.8), -0.8);
+
+                    // Draw
+                    graffitiApp.drawTrail(prevX, prevY, obj.x, obj.y, obj.type, obj.vx, obj.vy);
+
+                    // Update DOM
+                    const el = document.getElementById(`organism-${obj.id}`);
+                    if (el) {
+                        const tiltX = obj.vy * 8; 
+                        const tiltY = -obj.vx * 8;
+                        const breath = 1 + Math.sin(graffitiApp.time * 2 + obj.buoyancyOffset) * 0.02;
+                        el.style.transform = `translate(${obj.x - 50}px, ${obj.y - 50}px) rotate(${obj.rotation}deg) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${breath})`;
+                    }
+                });
+
+                graffitiApp.frameId = requestAnimationFrame(graffitiApp.loop);
+            },
+
+            drawTrail: (x1, y1, x2, y2, type, vx, vy) => {
+                const ctx = graffitiApp.ctx;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                const speed = Math.hypot(vx, vy);
+
+                ctx.save();
+                if (type === 'ink') {
+                    // INK ON DARK: White/Grey Smoke effect instead of black
+                    ctx.globalCompositeOperation = 'source-over'; 
+                    // Use a very light grey with low opacity for smoke
+                    ctx.strokeStyle = `rgba(220, 220, 230, ${Math.max(0.05, 0.2 - speed * 0.1)})`;
+                    ctx.lineWidth = Math.max(2, 25 - speed * 5);
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = 'rgba(255, 255, 255, 0.2)'; // Faint white glow
+                    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+                } else if (type === 'hiphop') {
+                    // HIPHOP ON DARK: Neon Graffiti
+                    const hue = (Date.now() / 40) % 360;
+                    ctx.globalCompositeOperation = 'screen'; // Screen mode makes colors pop on dark
+                    ctx.strokeStyle = `hsla(${hue}, 100%, 60%, 0.6)`;
+                    ctx.lineWidth = 15;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = `hsla(${hue}, 100%, 50%, 0.8)`;
+                    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+                } else if (type === 'acid') {
+                    // ACID ON DARK: Laser Beams
+                    ctx.globalCompositeOperation = 'lighter'; // Additive blending for max brightness
+                    ctx.strokeStyle = 'rgba(0, 255, 204, 0.5)'; // Cyber Cyan
+                    ctx.lineWidth = 4;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#00ffcc';
+                    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+                    // Sparkles
+                    if (Math.random() > 0.92) {
+                        ctx.fillStyle = '#fff';
+                        ctx.beginPath();
+                        ctx.arc(x2 + (Math.random()-0.5)*30, y2 + (Math.random()-0.5)*30, Math.random()*2, 0, Math.PI*2);
+                        ctx.fill();
+                    }
+                }
+                ctx.restore();
+            },
+
+            togglePlay: () => {
+                graffitiApp.isRunning = !graffitiApp.isRunning;
+                const icon = document.getElementById('gw-play-icon');
+                if(!graffitiApp.isRunning) {
+                   // Change to Play Icon
+                   icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+                } else {
+                   // Change to Pause Icon
+                   icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+                   if (!graffitiApp.frameId) graffitiApp.loop();
+                }
+            },
+
+            clearTank: () => {
+                graffitiApp.images = [];
+                graffitiApp.container.innerHTML = '';
+                graffitiApp.ctx.clearRect(0, 0, graffitiApp.canvas.width, graffitiApp.canvas.height);
+            },
+
+            saveArt: () => {
+                const finalCanvas = document.createElement('canvas');
+                finalCanvas.width = graffitiApp.canvas.width;
+                finalCanvas.height = graffitiApp.canvas.height;
+                const ctx = finalCanvas.getContext('2d');
+                
+                // Draw DARK background for save
+                const grd = ctx.createLinearGradient(0, 0, 0, finalCanvas.height);
+                grd.addColorStop(0, "#050505"); grd.addColorStop(1, "#1a1005");
+                ctx.fillStyle = grd; ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                
+                // Draw trails (Light on Dark)
+                ctx.drawImage(graffitiApp.canvas, 0, 0);
+                
+                // Draw objects
+                graffitiApp.images.forEach(obj => {
+                    const el = document.getElementById(`organism-${obj.id}`);
+                    if(el) {
+                        const img = el.querySelector('img');
+                        if(img.complete && img.naturalWidth !== 0) {
+                            ctx.save();
+                            ctx.translate(obj.x, obj.y);
+                            ctx.rotate(obj.rotation * Math.PI / 180);
+                            try { ctx.drawImage(img, -50, -50, 100, 100); } catch(e){}
+                            ctx.restore();
+                        }
+                    }
+                });
+
+                const link = document.createElement('a');
+                link.download = `PhotoGraffiti_${Date.now()}.png`;
+                link.href = finalCanvas.toDataURL();
+                link.click();
+            }
+        };
 
         // --- 3. Hologram Stage ---
         (function() {
             const container = document.getElementById('three-container'); const scene = new THREE.Scene();
+            // ... (Rest of Three.js code remains same) ...
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / (window.innerHeight * 0.9), 0.1, 1000); camera.position.z = 120; camera.position.y = 10;
             const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); renderer.setSize(window.innerWidth, window.innerHeight * 0.9); container.appendChild(renderer.domElement);
             const video = document.createElement('video'); video.src = 'images/wingchun.mp4'; video.loop = true; video.muted = true; video.play().catch(e=>console.log("Video not found, using noise fallback")); video.setAttribute('playsinline', '');
@@ -567,249 +1404,294 @@
             function animate() { requestAnimationFrame(animate); mat.uniforms.time.value += 0.02; renderer.render(scene, camera); }
             animate();
         })();
-
-        // --- LAB 1: AUDIO VIZ ---
-        let labCtx, analyser, labOsc, labLoop, currentAudioMode='zen';
-        function setAudioMode(mode) { currentAudioMode = mode; }
-        function startAudioPreview() {
-            if(!labCtx) { labCtx = new (window.AudioContext || window.webkitAudioContext)(); analyser = labCtx.createAnalyser(); analyser.fftSize = 64; analyser.connect(labCtx.destination); }
-            if(labCtx.state === 'suspended') labCtx.resume();
-            let beat = 0;
-            labLoop = setInterval(() => {
-                const t = labCtx.currentTime;
-                if(currentAudioMode === 'zen') {
-                   if(beat%8===0) { const o=labCtx.createOscillator(); o.frequency.value=220; const g=labCtx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.2,t+0.1); g.gain.exponentialRampToValueAtTime(0.01,t+2); o.connect(g); g.connect(analyser); o.start(); o.stop(t+2); }
-                } else if(currentAudioMode === 'hiphop') {
-                   if(beat%4===0) { const o=labCtx.createOscillator(); o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(0.01,t+0.3); const g=labCtx.createGain(); g.gain.setValueAtTime(1,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.3); o.connect(g); g.connect(analyser); o.start(); o.stop(t+0.3); }
-                   if(beat%2===1) { const o=labCtx.createOscillator(); o.type='square'; o.frequency.value=800; const g=labCtx.createGain(); g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.01,t+0.05); o.connect(g); g.connect(analyser); o.start(); o.stop(t+0.05); }
-                } else {
-                   const o=labCtx.createOscillator(); o.type='sawtooth'; o.frequency.value=174+Math.random()*2; const f=labCtx.createBiquadFilter(); f.frequency.value=300; const g=labCtx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.1,t+0.5); g.gain.linearRampToValueAtTime(0,t+1); o.connect(f); f.connect(g); g.connect(analyser); o.start(); o.stop(t+1);
-                }
-                beat++;
-            }, 250);
-            renderAudioViz();
-        }
-        function stopAudioPreview() { if(labLoop) clearInterval(labLoop); }
-        function renderAudioViz() {
-            const cvs = document.getElementById('viz-audio');
-            if(!cvs || !analyser) return;
-            const c = cvs.getContext('2d'); cvs.width=cvs.offsetWidth; cvs.height=cvs.offsetHeight;
-            const data = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(data);
-            c.clearRect(0,0,cvs.width,cvs.height); c.fillStyle = '#ffae00';
-            const bw = cvs.width/data.length;
-            for(let i=0; i<data.length; i++) {
-                const h = (data[i]/255)*cvs.height;
-                if(currentAudioMode==='zen') { c.beginPath(); c.arc(cvs.width/2, cvs.height/2, h/2, 0, Math.PI*2); c.strokeStyle='#ffae00'; c.stroke(); }
-                else if(currentAudioMode==='hiphop') c.fillRect(i*bw, cvs.height-h, bw-2, h);
-                else { c.beginPath(); c.arc(i*bw, cvs.height/2 + (Math.random()-0.5)*h, 2, 0, Math.PI*2); c.fill(); }
-            }
-            if(labLoop) requestAnimationFrame(renderAudioViz);
-        }
-
-        // --- LAB 2: SCENE VIZ ---
-        let sceneAnim, currentSceneMode='void';
-        function setSceneMode(mode) { currentSceneMode=mode; }
-        function startSceneViz() { renderSceneViz(); }
-        function stopSceneViz() { cancelAnimationFrame(sceneAnim); }
-        function renderSceneViz() {
-            const cvs = document.getElementById('viz-scene'); const c = cvs.getContext('2d');
-            cvs.width=cvs.offsetWidth; cvs.height=cvs.offsetHeight;
-            c.clearRect(0,0,cvs.width,cvs.height);
-            const t = Date.now()*0.001;
-            c.fillStyle='#fff'; c.strokeStyle='#ffae00';
-            if(currentSceneMode==='void') { c.beginPath(); c.arc(cvs.width/2, cvs.height/2, 50+Math.sin(t)*10, 0, Math.PI*2); c.stroke(); }
-            else if(currentSceneMode==='concrete') { for(let i=0;i<10;i++) c.strokeRect(cvs.width/2-50+Math.sin(t+i)*20, cvs.height/2-50+Math.cos(t+i)*20, 100, 100); }
-            else { c.beginPath(); for(let x=0; x<cvs.width; x+=10) c.lineTo(x, cvs.height/2 + Math.sin(t*2 + x*0.05)*30); c.stroke(); }
-            sceneAnim = requestAnimationFrame(renderSceneViz);
-        }
-
-        // --- LAB 3: 3D AVATAR ---
-        let avScene, avCam, avRen, avRobot, avAnimId, currentAvatarMode='wingchun';
-        function initLab3D() {
-            const cont = document.getElementById('avatar-3d-container');
-            avScene = new THREE.Scene();
-            avCam = new THREE.PerspectiveCamera(50, cont.offsetWidth/cont.offsetHeight, 0.1, 100); avCam.position.set(0, 10, 40);
-            avRen = new THREE.WebGLRenderer({alpha:true, antialias:true}); avRen.setSize(cont.offsetWidth, cont.offsetHeight);
-            cont.appendChild(avRen.domElement);
-            avRobot = new THREE.Group();
-            const mat = new THREE.MeshBasicMaterial({color:0xffae00, wireframe:true});
-            const createLimb = (w,h,d,y) => { const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat); m.position.y=y; return m; }
-            const torso = createLimb(6,10,4, 5); avRobot.add(torso);
-            const head = createLimb(4,5,4, 14); avRobot.add(head);
-            const lArm = new THREE.Group(); lArm.position.set(-4,9,0); const lArmMesh = createLimb(2,8,2, -4); lArm.add(lArmMesh); avRobot.add(lArm);
-            const rArm = new THREE.Group(); rArm.position.set(4,9,0); const rArmMesh = createLimb(2,8,2, -4); rArm.add(rArmMesh); avRobot.add(rArm);
-            const lLeg = new THREE.Group(); lLeg.position.set(-2,0,0); const lLegMesh = createLimb(2.5,10,2.5, -5); lLeg.add(lLegMesh); avRobot.add(lLeg);
-            const rLeg = new THREE.Group(); rLeg.position.set(2,0,0); const rLegMesh = createLimb(2.5,10,2.5, -5); rLeg.add(rLegMesh); avRobot.add(rLeg);
-            avRobot.parts = {head, lArm, rArm, lLeg, rLeg}; avScene.add(avRobot);
-        }
-        function setAvatarMode(mode) { currentAvatarMode = mode; }
-        function startAvatar() { if(!avScene) initLab3D(); animateAvatar(); }
-        function stopAvatar() { cancelAnimationFrame(avAnimId); }
-        function animateAvatar() {
-            avAnimId = requestAnimationFrame(animateAvatar);
-            const t = Date.now() * 0.005; const p = avRobot.parts;
-            if(currentAvatarMode === 'wingchun') { p.lArm.rotation.z = -0.5; p.lArm.rotation.x = Math.sin(t)*0.2 - 0.5; p.rArm.rotation.z = 0.5; p.rArm.rotation.x = Math.cos(t)*0.2 - 0.5; p.lLeg.rotation.x = 0; p.rLeg.rotation.x = 0; avRobot.position.y = 0; }
-            else if(currentAvatarMode === 'hiphop') { const bounce = Math.abs(Math.sin(t*2)); avRobot.position.y = bounce * 2; p.lArm.rotation.z = Math.sin(t)*0.5 - 1; p.lArm.rotation.x = 0; p.rArm.rotation.z = -Math.sin(t)*0.5 + 1; p.rArm.rotation.x = 0; p.lLeg.rotation.x = -bounce*0.5; p.rLeg.rotation.x = -bounce*0.5; }
-            else { avRobot.position.y = Math.sin(t)*2 + 2; avRobot.rotation.z = Math.sin(t*0.5)*0.2; p.lArm.rotation.z = -2 + Math.sin(t)*0.5; p.rArm.rotation.z = 2 + Math.cos(t)*0.5; p.lLeg.rotation.x = Math.sin(t)*0.2; p.rLeg.rotation.x = Math.cos(t)*0.2; }
-            avRen.render(avScene, avCam);
-        }
-
-        // --- 4. Chronos Gate ---
-        let chronosRunning = false;
-        let cScene, cCam, cRenderer, cClock;
-        let cGroups = [], hiphopU, triphopU;
-        let audioCtx, zenNodes=[], triphopNodes=[], hiphopTimer=null;
-        const WORLDS = { ZEN: 0, HIPHOP: 1, TRIPHOP: 2 };
-        let curWorld = WORLDS.ZEN;
-        const videoEl = document.getElementById('webcam-preview');
-        const mCanvas = document.getElementById('process-canvas'); const mCtx = mCanvas.getContext('2d', {willReadFrequently:true});
-        const dCanvas = document.getElementById('motion-debug'); const dCtx = dCanvas.getContext('2d');
-        let lastFrame = null; let eCenter=0, eEdge=0, sTimer=0;
-        let isChronosVisible = false;
         
-        async function initChronosGate() {
-            document.querySelector('.gate-start-layer').classList.add('hidden');
-            document.querySelector('.gate-hud').classList.add('active');
-            document.querySelector('.gate-controls').classList.add('visible');
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 160, height: 120 }, audio: false });
-                videoEl.srcObject = stream;
-                mCanvas.width = 32; mCanvas.height = 24; dCanvas.width = 32; dCanvas.height = 24;
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // ... (Rest of Audio Engine, Synth App, and Outro code remains same) ...
+        // ... (Appending JS code for brevity in display, full file has all logic) ...
+        // I will finish the rest of the JS logic below to ensure the file works completely.
+
+        // ==========================================
+        // 4. SYNTH MODULE LOGIC (Existing)
+        // ==========================================
+        const ASSETS = [
+            { id: 0, move: "Center Line Reset (回正)", inst: "Ambient Pad", desc: "MEANING: Reset pose between movements.\nPHILOSOPHY: Never deviate from the center line; maintain balance.\nTECHNIQUE: Hands guarding chest naturally; center of gravity grounded.", imageSrc: "assets/move_01_tansao.jpg", timbreVideoSrc: "assets/timbre_01_pad.mp4", active: true },
+            { id: 1, move: "Chi Sau (黐手)", inst: "Acid 303 Bass", desc: "MEANING: Training arm sensitivity and flow.\nTECHNIQUE: Hands sticking together, sensing and redirecting force like flowing mercury.", imageSrc: "assets/move_02_bongsao.jpg", timbreVideoSrc: "assets/timbre_02_acid.mp4", active: false },
+            { id: 2, move: "Bong Sau (膀手)", inst: "BoomBap Snare", desc: "MEANING: Wing arm technique to deflect attacks.\nTECHNIQUE: Elbow raised, rotating forearm outward to divert force using leverage.", imageSrc: "assets/move_03_paksao.jpg", timbreVideoSrc: "assets/timbre_03_snare.mp4", active: false },
+            { id: 3, move: "Chit Jeung (切掌)", inst: "Rolling Hi-Hats", desc: "MEANING: Continuous straight-line chopping attacks.\nAUDIO SYNC: Corresponds to rolling Hi-Hats in Trap music, building tension.", imageSrc: "assets/move_04_punch.jpg", timbreVideoSrc: "assets/timbre_04_hihat.mp4", active: false },
+            { id: 4, move: "Saam Sing Kuen (三星拳)", inst: "808 Sub Bass", desc: "MEANING: Diagonal chopping strikes to break defense.\nTECHNIQUE: Power generated from waist and legs, delivering heavy, penetrating strikes.", imageSrc: "assets/move_05_fooksao.jpg", timbreVideoSrc: "assets/timbre_05_sub.mp4", active: false },
+            { id: 5, move: "Outside Crescent Kick (外摆踢)", inst: "Pluck Synth", desc: "MEANING: Outward arcing leg sweep to disturb balance.\nTECHNIQUE: Fluid arc motion from inside out, utilizing the toe or instep.", imageSrc: "assets/move_06_gumsao.jpg", timbreVideoSrc: "assets/timbre_06_kick.mp4", active: false },
+            { id: 6, move: "Side Kick (侧踢腿)", inst: "Heavy Kick", desc: "MEANING: Lateral thrust kick to control distance.\nTECHNIQUE: Stable support leg; heel thrusts out horizontally. Rhythm skeleton.", imageSrc: "assets/move_07_biujee.jpg", timbreVideoSrc: "assets/timbre_07_lead.mp4", active: true }
+        ];
+
+        class AudioEngine {
+            constructor() {
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                this.masterGain = this.ctx.createGain();
+                this.masterGain.gain.value = 0.5;
+                this.masterGain.connect(this.ctx.destination);
                 
-                const container = document.getElementById('chronos-container');
-                cClock = new THREE.Clock(); cScene = new THREE.Scene();
-                cCam = new THREE.PerspectiveCamera(65, container.offsetWidth/container.offsetHeight, 0.1, 2000); cCam.position.z = 100;
-                cRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); cRenderer.setSize(container.offsetWidth, container.offsetHeight);
-                container.appendChild(cRenderer.domElement);
+                this.analyser = this.ctx.createAnalyser();
+                this.analyser.fftSize = 2048;
+                this.masterGain.connect(this.analyser);
 
-                createZenWorld(); createHipHopWorld(); createTripHopWorld();
-                
-                chronosRunning = true; 
-                cAnimate(); cMotionLoop(); 
+                this.reverb = this.ctx.createConvolver();
+                this.generateReverb();
+                this.reverbGain = this.ctx.createGain();
+                this.reverbGain.gain.value = 0.3;
+                this.reverb.connect(this.reverbGain);
+                this.reverbGain.connect(this.masterGain);
 
-                const gateSection = document.querySelector('.chronos-section');
-                const audioObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(e => {
-                        if(!chronosRunning) return;
-                        isChronosVisible = e.isIntersecting;
-
-                        if(e.isIntersecting) { 
-                            if(audioCtx.state === 'suspended') audioCtx.resume(); 
-                            startWorldAudio(curWorld); 
-                        } else { 
-                            stopZenAudio(); stopHipHopAudio(); stopTripHopAudio(); 
-                        }
-                    });
-                }, { threshold: 0.1 });
-                audioObserver.observe(gateSection);
-            } catch (e) { console.error(e); alert("Please enable camera access."); }
-        }
-
-        // --- AUDIO ENGINES ---
-        function startZenAudio() {
-            const createDrone = (freq) => { const osc = audioCtx.createOscillator(); osc.frequency.value = freq; const gain = audioCtx.createGain(); gain.gain.value = 0.05; osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); return {o:osc, g:gain}; };
-            zenNodes.push(createDrone(110)); zenNodes.push(createDrone(112));
-            
-            const playBowl = () => {
-                 const t = audioCtx.currentTime;
-                 [220, 540, 800].forEach(f => {
-                     const o = audioCtx.createOscillator();
-                     o.frequency.value = f;
-                     const g = audioCtx.createGain();
-                     g.gain.setValueAtTime(0, t);
-                     g.gain.linearRampToValueAtTime(0.3, t + 0.02);
-                     g.gain.exponentialRampToValueAtTime(0.001, t + 4);
-                     o.connect(g); g.connect(audioCtx.destination);
-                     o.start(); o.stop(t + 4);
-                 });
-            };
-            playBowl(); 
-            const bowlLoop = setInterval(playBowl, 3000);
-            zenNodes.push({interval: bowlLoop});
-        }
-        function stopZenAudio() { zenNodes.forEach(n => { if(n.o) { n.g.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5); setTimeout(()=>n.o.stop(), 500); } if(n.interval) clearInterval(n.interval); }); zenNodes = []; }
-        function playKick(t) { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.5); gain.gain.setValueAtTime(1, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.5); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(t); osc.stop(t + 0.5); }
-        function playSnare(t) { const bufferSize = audioCtx.sampleRate * 0.2; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i=0; i<bufferSize; i++) data[i]=(Math.random()*2-1); const noise = audioCtx.createBufferSource(); noise.buffer = buffer; const filter = audioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 1000; const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.8, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2); noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start(t); }
-        function playHat(t) { const bufferSize = audioCtx.sampleRate * 0.05; const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = buffer.getChannelData(0); for (let i=0; i<bufferSize; i++) data[i]=(Math.random()*2-1); const noise = audioCtx.createBufferSource(); noise.buffer = buffer; const filter = audioCtx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 5000; const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.3, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05); noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start(t); }
-        function startHipHopAudio() { let beat = 0; const stepTime = 60/90/2; hiphopTimer = setInterval(() => { const t = audioCtx.currentTime; if(beat%8 === 0) playKick(t); if(beat%8 === 2) playHat(t); if(beat%8 === 4) { playSnare(t); playKick(t+0.1); } if(beat%8 === 6) playHat(t); beat++; }, stepTime * 1000); }
-        function stopHipHopAudio() { clearInterval(hiphopTimer); }
-        function startTripHopAudio() { const freqs = [174.61, 207.65, 261.63, 311.13]; const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400; const lfo = audioCtx.createOscillator(); lfo.frequency.value = 0.2; const lfoGain = audioCtx.createGain(); lfoGain.gain.value = 200; lfo.connect(lfoGain); lfoGain.connect(filter.frequency); const masterG = audioCtx.createGain(); masterG.gain.value = 0; filter.connect(masterG); masterG.connect(audioCtx.destination); freqs.forEach(f => { const osc = audioCtx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = f + (Math.random()-0.5)*2; osc.connect(filter); osc.start(); triphopNodes.push(osc); }); lfo.start(); triphopNodes.push(lfo); triphopNodes.push(masterG); masterG.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 2); }
-        function stopTripHopAudio() { if(triphopNodes.length>0) { const g = triphopNodes[triphopNodes.length-1]; if(g && g.gain) g.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5); setTimeout(() => { triphopNodes.forEach(n => { try{n.stop()}catch(e){} }); triphopNodes=[]; }, 1000); } }
-        function startWorldAudio(idx) { stopZenAudio(); stopHipHopAudio(); stopTripHopAudio(); if(idx === 0) startZenAudio(); if(idx === 1) startHipHopAudio(); if(idx === 2) startTripHopAudio(); }
-
-        // --- WORLD LOGIC ---
-        function createZenWorld() {
-            const g = new THREE.Group(); cGroups.push(g);
-            const geo = new THREE.BufferGeometry(); const pos=[], size=[];
-            for(let i=0;i<1000;i++){ pos.push((Math.random()-0.5)*300,(Math.random()-0.5)*300,(Math.random()-0.5)*200); size.push(Math.random()*4+2); }
-            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3)); geo.setAttribute('size', new THREE.Float32BufferAttribute(size,1));
-            g.add(new THREE.Points(geo, new THREE.ShaderMaterial({ uniforms:{time:{value:0}, color:{value:new THREE.Color(0xffccaa)}}, vertexShader:document.getElementById('vs-zen').textContent, fragmentShader:document.getElementById('fs-zen').textContent, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false })));
-            cScene.add(g);
-        }
-        function createHipHopWorld() {
-            const g = new THREE.Group(); cGroups.push(g);
-            const base = new THREE.TetrahedronGeometry(4); const geo = new THREE.InstancedBufferGeometry();
-            geo.index = base.index; geo.attributes.position = base.attributes.position;
-            const off=[], col=[]; for(let i=0;i<500;i++){ off.push((Math.random()-0.5)*200,(Math.random()-0.5)*200,(Math.random()-0.5)*200); col.push(Math.random()>0.5?1:0, 0, Math.random()>0.5?0:1); }
-            geo.setAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(off),3)); geo.setAttribute('colorAttr', new THREE.InstancedBufferAttribute(new Float32Array(col),3));
-            hiphopU = {time:{value:0}, uEnergy:{value:0}};
-            g.add(new THREE.Mesh(geo, new THREE.ShaderMaterial({uniforms:hiphopU, vertexShader:document.getElementById('vs-hiphop').textContent, fragmentShader:document.getElementById('fs-hiphop').textContent, transparent:true, blending:THREE.AdditiveBlending})));
-            cScene.add(g); g.visible=false;
-        }
-        function createTripHopWorld() {
-            const g = new THREE.Group(); cGroups.push(g);
-            const geo = new THREE.PlaneGeometry(400,400,60,60); triphopU = {time:{value:0}, uFlow:{value:0}};
-            const m = new THREE.Mesh(geo, new THREE.ShaderMaterial({uniforms:triphopU, vertexShader:document.getElementById('vs-triphop').textContent, fragmentShader:document.getElementById('fs-triphop').textContent, transparent:true, opacity:0.6, wireframe:true}));
-            m.rotation.x=-Math.PI/2; m.position.y=-50; g.add(m); cScene.add(g); g.visible=false;
-        }
-        function switchWorld(idx) {
-            if(curWorld===idx) return;
-            curWorld = idx;
-            const ui = [ 
-                {t:"ZEN REALM", s:"ZEN MEDITATION · BOWL", c:"#000", i:"⛩️"}, 
-                {t:"THE BRONX", s:"STREET RHYTHM · FLOW", c:"#100", i:"🔥"}, 
-                {t:"VOID CLUB", s:"PSYCHEDELIC · TRANCE", c:"#001", i:"🌌"} 
-            ][idx];
-            document.getElementById('gate-ui-title').innerText = ui.t; document.getElementById('gate-ui-sub').innerText = ui.s;
-            document.getElementById('gate-ui-icon').innerText = ui.i; document.querySelector('.chronos-section').style.backgroundColor = ui.c;
-            cGroups.forEach((g,i)=>g.visible=(i===idx));
-            
-            if(isChronosVisible) {
-                startWorldAudio(idx);
+                this.tempo = 120;
+                this.isPlaying = false;
+                this.timerID = null;
             }
-            eCenter=0; eEdge=0; sTimer=0;
-        }
-        function cAnimate() { if(!chronosRunning) return; requestAnimationFrame(cAnimate); const t = cClock.getElapsedTime(); if(curWorld===0) cGroups[0].children[0].material.uniforms.time.value = t; if(curWorld===1) hiphopU.time.value = t; if(curWorld===2) triphopU.time.value = t; cRenderer.render(cScene, cCam); }
-        function cMotionLoop() {
-            if(!chronosRunning) { requestAnimationFrame(cMotionLoop); return; }
-            const w=32, h=24; mCtx.drawImage(videoEl, 0, 0, w, h); const frame = mCtx.getImageData(0,0,w,h); dCtx.fillStyle='#000'; dCtx.fillRect(0,0,w,h);
-            if(lastFrame) {
-                let center=0, edge=0, total=0;
-                for(let i=0; i<frame.data.length; i+=4) {
-                    if(Math.abs(frame.data[i]-lastFrame.data[i]) > 20) { total++; const p=i/4; const x=p%w; const y=Math.floor(p/w); dCtx.fillStyle='#0f0'; dCtx.fillRect(x,y,1,1); if(x>w*0.35 && x<w*0.65 && y>h*0.35 && y<h*0.65) center++; else if(x<w*0.2 || x>w*0.8) edge++; }
+
+            resume() { if(this.ctx.state === 'suspended') this.ctx.resume(); }
+
+            generateReverb() {
+                const rate = this.ctx.sampleRate;
+                const length = rate * 2;
+                const impulse = this.ctx.createBuffer(2, length, rate);
+                for(let i=0; i<2; i++) {
+                    const ch = impulse.getChannelData(i);
+                    for(let j=0; j<length; j++) ch[j] = (Math.random()*2-1) * Math.pow(1-j/length, 2);
                 }
-                if(total<5) { sTimer++; if(sTimer>60 && curWorld!==0) switchWorld(0); } 
-                else { sTimer=0; if(center>10 && curWorld!==1) { eCenter++; if(eCenter>5) switchWorld(1); } else eCenter=0; if(edge>10 && curWorld!==2) { eEdge++; if(eEdge>8) switchWorld(2); } else eEdge=0; }
-                if(curWorld===1 && center>5) hiphopU.uEnergy.value=1; else if(curWorld===1) hiphopU.uEnergy.value*=0.9;
-                if(curWorld===2 && edge>5) triphopU.uFlow.value=1; else if(curWorld===2) triphopU.uFlow.value*=0.95;
+                this.reverb.buffer = impulse;
             }
-            lastFrame = frame; requestAnimationFrame(cMotionLoop);
+
+            playTone(freq, type, time, dur, vol) {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, time);
+                gain.gain.setValueAtTime(vol, time);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+                
+                osc.connect(gain);
+                gain.connect(this.masterGain);
+                gain.connect(this.reverb);
+                osc.start(time);
+                osc.stop(time + dur);
+            }
+
+            playKick(t) {
+                const osc = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                osc.frequency.setValueAtTime(150, t);
+                osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.5);
+                g.gain.setValueAtTime(0.8, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+                osc.connect(g); g.connect(this.masterGain);
+                osc.start(t); osc.stop(t + 0.5);
+            }
+
+            playSnare(t) {
+                const b = this.ctx.createBuffer(1, this.ctx.sampleRate*0.1, this.ctx.sampleRate);
+                const d = b.getChannelData(0);
+                for(let i=0; i<d.length; i++) d[i] = Math.random()*2-1;
+                const src = this.ctx.createBufferSource();
+                src.buffer = b;
+                const g = this.ctx.createGain();
+                g.gain.setValueAtTime(0.4, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t+0.1);
+                src.connect(g); g.connect(this.masterGain); g.connect(this.reverb);
+                src.start(t);
+            }
+
+            playHiHat(t) {
+                const osc = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                const f = this.ctx.createBiquadFilter();
+                osc.type = 'square'; osc.frequency.value = 8000;
+                f.type = 'highpass'; f.frequency.value = 7000;
+                g.gain.setValueAtTime(0.1, t);
+                g.gain.exponentialRampToValueAtTime(0.01, t+0.05);
+                osc.connect(f); f.connect(g); g.connect(this.masterGain);
+                osc.start(t); osc.stop(t+0.05);
+            }
+
+            playBass(t) {
+                const osc = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                const f = this.ctx.createBiquadFilter();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(55, t);
+                f.type = 'lowpass'; f.Q.value = 10;
+                f.frequency.setValueAtTime(200, t);
+                f.frequency.linearRampToValueAtTime(800, t+0.1);
+                f.frequency.linearRampToValueAtTime(200, t+0.2);
+                g.gain.setValueAtTime(0.3, t);
+                g.gain.linearRampToValueAtTime(0, t+0.2);
+                osc.connect(f); f.connect(g); g.connect(this.masterGain);
+                osc.start(t); osc.stop(t+0.2);
+            }
+
+            schedule(step, t) {
+                if(ASSETS[0].active && step===0) this.playTone(220, 'triangle', t, 3, 0.1); // Pad
+                if(ASSETS[1].active && [2,5,8,11,14].includes(step)) this.playBass(t); // Acid
+                if(ASSETS[2].active && step%8===4) this.playSnare(t); // Snare
+                if(ASSETS[3].active && step%2===0) this.playHiHat(t); // Hats
+                if(ASSETS[4].active && step===0) this.playTone(40, 'sine', t, 0.8, 0.6); // Sub
+                if(ASSETS[5].active && [12,14].includes(step)) this.playTone(880, 'square', t, 0.1, 0.05); // Lead
+                if(ASSETS[6].active && step%4===0) this.playKick(t); // Kick
+            }
+
+            start() {
+                this.isPlaying = true;
+                this.resume();
+                let step = 0;
+                let nextTime = this.ctx.currentTime;
+                
+                this.timerID = setInterval(() => {
+                    const now = this.ctx.currentTime;
+                    while(nextTime < now + 0.1) {
+                        this.schedule(step, nextTime);
+                        document.getElementById('play-head').style.width = (step/16)*100 + '%';
+                        step = (step + 1) % 16;
+                        nextTime += (60/this.tempo)/4;
+                    }
+                }, 25);
+            }
+
+            stop() {
+                this.isPlaying = false;
+                clearInterval(this.timerID);
+                document.getElementById('play-head').style.width = '0%';
+            }
         }
 
-        // --- 5. Outro: The Infinite Black & White World (Fixed) ---
+        const synthApp = {
+            audio: new AudioEngine(),
+            selectedId: 0,
+
+            init: () => {
+                synthApp.renderSequencer();
+                synthApp.selectTrack(0);
+                // synthApp.animateBg(); // REMOVED: Canvas was replaced by CSS blobs
+                synthApp.initVisualizer();
+                synthApp.initVideoHover();
+            },
+
+            initVideoHover: () => {
+                const v = document.getElementById('timbreVideo');
+                v.parentElement.addEventListener('mouseenter', () => v.muted = false);
+                v.parentElement.addEventListener('mouseleave', () => v.muted = true);
+            },
+
+            togglePlay: () => {
+                const btn = document.getElementById('playBtn');
+                if(synthApp.audio.isPlaying) {
+                    synthApp.audio.stop();
+                    btn.innerText = "INITIALIZE SEQUENCE";
+                    btn.style.borderColor = "var(--glass-border)";
+                    btn.style.color = "var(--ethereal-cyan)";
+                    btn.style.background = "transparent";
+                } else {
+                    synthApp.audio.start();
+                    btn.innerText = "HALT SYSTEM";
+                    btn.style.borderColor = "transparent";
+                    btn.style.color = "#fff";
+                    btn.style.background = "var(--ethereal-cyan)";
+                    btn.style.boxShadow = "0 0 20px var(--glow-color)";
+                }
+            },
+
+            toggleAll: (val) => {
+                ASSETS.forEach(a => a.active = val);
+                synthApp.renderSequencer();
+            },
+
+            toggleTrack: (e, id) => {
+                e.stopPropagation();
+                const a = ASSETS.find(x => x.id === id);
+                a.active = !a.active;
+                synthApp.renderSequencer();
+            },
+
+            selectTrack: (id) => {
+                synthApp.selectedId = id;
+                const data = ASSETS.find(x => x.id === id);
+                
+                document.getElementById('displayTitle').innerText = data.move.split('(')[0];
+                document.getElementById('displaySubtitle').innerText = data.inst;
+                document.getElementById('displayText').innerText = data.desc;
+                
+                const img = document.getElementById('mainImage');
+                img.style.opacity = 0;
+                setTimeout(() => {
+                    img.src = data.imageSrc; 
+                    img.onerror = () => { img.src = `https://placehold.co/600x400/111/FFF?text=${encodeURIComponent(data.move.split('(')[0])}`; };
+                    img.onload = () => { img.style.opacity = 0.9; };
+                }, 200);
+
+                const vid = document.getElementById('timbreVideo');
+                vid.src = data.timbreVideoSrc;
+                vid.play().catch(()=>{});
+
+                synthApp.renderSequencer();
+            }, // Added closing brace and comma
+
+            renderSequencer: () => {
+                const list = document.getElementById('trackList');
+                list.innerHTML = '';
+                
+                ASSETS.forEach(a => {
+                    const card = document.createElement('div');
+                    // New Classes for Ethereal Design
+                    card.className = `seq-item ${a.active ? 'active' : ''} ${synthApp.selectedId === a.id ? 'selected' : ''}`;
+                    card.onclick = () => synthApp.selectTrack(a.id);
+                    
+                    card.innerHTML = `
+                        <div>
+                            <div class="seq-name" style="opacity:${a.active ? '1' : '0.6'}">${a.move.split('(')[0]}</div>
+                            <div class="seq-inst">${a.inst}</div>
+                        </div>
+                        <div class="seq-toggle" onclick="synthApp.toggleTrack(event, ${a.id})"></div>
+                    `;
+                    list.appendChild(card);
+                });
+            },
+
+            initVisualizer: () => {
+                const cvs = document.getElementById('scopeCanvas');
+                const ctx = cvs.getContext('2d');
+                const draw = () => {
+                    requestAnimationFrame(draw);
+                    if(synthApp.audio.analyser) {
+                        const data = new Uint8Array(synthApp.audio.analyser.frequencyBinCount);
+                        synthApp.audio.analyser.getByteTimeDomainData(data);
+                        ctx.clearRect(0,0,cvs.width,cvs.height);
+                        ctx.lineWidth = 2;
+                        // CHANGED TO GOLD
+                        ctx.strokeStyle = '#ffae00'; 
+                        ctx.beginPath();
+                        const slice = cvs.width * 1.0 / data.length;
+                        let x = 0;
+                        for(let i=0; i<data.length; i++) {
+                            const v = data[i] / 128.0;
+                            const y = v * cvs.height/2;
+                            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                            x += slice;
+                        }
+                        ctx.lineTo(cvs.width, cvs.height/2);
+                        ctx.stroke();
+                    }
+                };
+                draw();
+            }
+        };
+
+        synthApp.init();
+
+        // --- 5. Outro: The Infinite Black & White World ---
         (function() {
             const container = document.getElementById('outro-canvas-container');
             if(!container) return;
 
-            // --- Scene Setup ---
             const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000); // Black Void
-            scene.fog = new THREE.FogExp2(0x000000, 0.02); // Dark fog to blend ground
+            scene.background = new THREE.Color(0x000000); 
+            scene.fog = new THREE.FogExp2(0x000000, 0.02); 
 
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 5, 45); // Adjust camera back a bit
+            camera.position.set(0, 5, 45); 
 
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -830,7 +1712,6 @@
             controls.enableZoom = false; 
             controls.enablePan = false;
 
-            // --- 2. Ground: Soft Powder Snow (White) ---
             function createNoiseTexture() {
                 const size = 512; const canvas = document.createElement('canvas'); canvas.width = size; canvas.height = size; const ctx = canvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, size, size);
                 for (let i = 0; i < 20000; i++) { const x = Math.random() * size; const y = Math.random() * size; const val = Math.random() * 20 + 235; ctx.fillStyle = `rgb(${val},${val},${val})`; ctx.fillRect(x, y, 2, 2); }
@@ -841,7 +1722,6 @@
             const posAttribute = planeGeo.attributes.position;
             for (let i = 0; i < posAttribute.count; i++) {
                 const x = posAttribute.getX(i); const y = posAttribute.getY(i);
-                // Slight bumps
                 const z = Math.sin(x * 0.02) * Math.cos(y * 0.02) * 1.5 + Math.random() * 0.1;
                 posAttribute.setZ(i, z);
             }
@@ -860,22 +1740,19 @@
             ground.receiveShadow = true;
             scene.add(ground);
 
-            // --- 3. Rising Lines (Particles) ---
             const lineGeo = new THREE.BufferGeometry();
-            const lineCount = 400; // Number of lines
+            const lineCount = 400; 
             const linePos = [];
             for(let i=0; i<lineCount; i++) {
-                // Random spread
                 const x = (Math.random() - 0.5) * 150;
                 const z = (Math.random() - 0.5) * 150;
                 const y = Math.random() * 100;
-                // Create a vertical segment: bottom and top vertex
                 linePos.push(x, y, z);
-                linePos.push(x, y + 5 + Math.random() * 5, z); // Length 5-10
+                linePos.push(x, y + 5 + Math.random() * 5, z); 
             }
             lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
             const lineMat = new THREE.LineBasicMaterial({
-                color: 0xffffff,
+                color: 0xffffff, 
                 transparent: true,
                 opacity: 0.15,
                 blending: THREE.AdditiveBlending
@@ -883,10 +1760,8 @@
             const risingLines = new THREE.LineSegments(lineGeo, lineMat);
             scene.add(risingLines);
 
-            // --- 4. The Door (Small, Centered, Glowing) ---
             const doorGroup = new THREE.Group();
             
-            // Texture for glow
             function getLightTexture() {
                 const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 128; const ctx = canvas.getContext('2d');
                 const grd = ctx.createRadialGradient(32, 64, 5, 32, 64, 60);
@@ -897,21 +1772,18 @@
                 return new THREE.CanvasTexture(canvas);
             }
 
-            // Light Sheet (Scaled Down)
-            const sheetGeo = new THREE.PlaneGeometry(4, 8); // Smaller size
+            const sheetGeo = new THREE.PlaneGeometry(4, 8); 
             const sheetMat = new THREE.MeshBasicMaterial({ 
                 map: getLightTexture(),
                 color: 0xffaa00, side: THREE.DoubleSide, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false 
             });
             const sheet = new THREE.Mesh(sheetGeo, sheetMat);
-            sheet.position.y = 4; // Center on y-axis (half height)
+            sheet.position.y = 4; 
 
-            // Border
             const borderGeo = new THREE.BoxGeometry(4.2, 8.2, 0.1); 
             const borderMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, blending: THREE.AdditiveBlending });
             const border = new THREE.Mesh(borderGeo, borderMat); border.position.y = 4;
 
-            // Rim Lines
             const edges = new THREE.EdgesGeometry(borderGeo);
             const rimMat = new THREE.LineBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
             const rims = new THREE.LineSegments(edges, rimMat); rims.position.y = 4;
@@ -919,23 +1791,19 @@
             doorGroup.add(sheet); doorGroup.add(border); doorGroup.add(rims);
             scene.add(doorGroup);
 
-            // --- 5. Lighting ---
-            const ambient = new THREE.AmbientLight(0x404040, 1.5); // Soft white light
+            const ambient = new THREE.AmbientLight(0x404040, 1.5); 
             scene.add(ambient);
             
-            // Spotlight on the door area to light up the snow beneath
             const spotLight = new THREE.SpotLight(0xffaa00, 10, 60, 0.5, 0.5, 1);
             spotLight.position.set(0, 20, 10);
             spotLight.target = doorGroup;
             spotLight.castShadow = true;
             scene.add(spotLight);
 
-            // Orange Point light for local reflection
             const pLight = new THREE.PointLight(0xffaa00, 3, 20);
             pLight.position.set(0, 4, 2);
             scene.add(pLight);
 
-            // --- 6. Typewriter Effect (Trigger) ---
             const textContent = "Beyond this door, there is nothing. No correct answers, no defined self, no singular path—only freedom.\n\nAs Song Dynasty Zen Master Wumen Huikai wrote:\n'The Great Way has no gate, yet there are a thousand paths.'\n\nThe true way has no fixed form. Though its formlessness may be bewildering, your own unique path is always there.";
             const textEl = document.getElementById('outro-text');
             let hasTyped = false;
@@ -959,21 +1827,18 @@
             }, { threshold: 0.1 });
             outroObserver.observe(container);
 
-            // --- 7. Animation Loop ---
             function animateScene() {
                 requestAnimationFrame(animateScene);
                 controls.update();
                 const t = Date.now() * 0.002;
                 
-                // Pulse door
                 sheet.material.opacity = 0.8 + Math.sin(t * 3) * 0.1;
                 pLight.intensity = 3 + Math.sin(t * 5) * 1.0;
 
-                // Animate rising lines (looping vertically)
                 const pos = risingLines.geometry.attributes.position.array;
                 for(let i=1; i<pos.length; i+=3) {
-                    pos[i] += 0.15; // Speed up
-                    if(pos[i] > 100) pos[i] = 0; // Reset to ground
+                    pos[i] += 0.15; 
+                    if(pos[i] > 100) pos[i] = 0; 
                 }
                 risingLines.geometry.attributes.position.needsUpdate = true;
 
